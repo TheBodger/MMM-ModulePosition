@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Drag Drop Demo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.8/interact.min.js"></script>
+<script src="config.js"></script>
+<link href="StyleSheet1.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+
+<body style="background-color: black">
+
+<div class="region top bar" style="background-color: lime;">
+	<div class="container" style="display: block;">
+		<div id="module_5_newsfeed" class="module newsfeed newsfeed resize-drag" style="transition: opacity 1.25s ease 0s; opacity: 1; position: static;">
+			<div class="modulestuff">
+				Resize from any edge or corner
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="" style="width: 600px; height: 300px; background-color: yellow; position: relative">
+	<div class="module compliments resize-drag">
+		Resize from any edge or corner </div>
+</div>
+
+<div id="currentmodulemeta" class="currentmodulemeta">
+	<a id="save-button" class="save-button glass" href="#" onclick="saveFunction()">
+	Save </a>
+</div>
+
+<!-- needs to be last or use z series-->
+<script src="Script2.js"></script>
+<script src="Script1.js"></script>
+
+</body>
+
+</html>

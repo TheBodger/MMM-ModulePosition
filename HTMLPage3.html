@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta charset="utf-8" />
+<title></title>
+
+   <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.9/interact.js"></script> -->
+   
+     <script src="file:///D:\Users\KCPFr\Source\Workspaces\NODEJS\modPos\modPos\node_modules\requirejs\require.js"></script>
+
+<script>
+
+
+
+const interact = require(['interactjs'])
+
+</script>
+
+<script>// Step 1
+const slider = interact('.slider')    // target elements with the "slider" class
+
+slider
+  // Step 2
+  .draggable({                        // make the element fire drag events
+    origin: 'self',                   // (0, 0) will be the element's top-left
+    inertia: true,                    // start inertial movement if thrown
+    modifiers: [
+      interact.modifiers.restrict({
+        restriction: 'self'           // keep the drag coords within the element
+      })
+    ],
+    // Step 3
+    listeners: {
+      move (event) {                  // call this listener on every dragmove
+        const sliderWidth = interact.getElementRect(event.target.parentNode).width
+        const value = event.pageX / sliderWidth
+
+        event.target.style.paddingLeft = (value * 100) + '%'
+        event.target.setAttribute('data-value', value.toFixed(2))
+      }
+    }
+  })</script>
+<style>
+.sliders {
+	padding: 1.5em;
+}
+/* the slider bar */
+.slider {
+	position: relative;
+	width: 100%;
+	height: 1em;
+	margin: 1.5em auto;
+	background-color: #29e;
+	border-radius: 0.5em;
+	box-sizing: border-box;
+	font-size: 1em;
+	-ms-touch-action: none;
+	touch-action: none;
+}
+/* the slider handle */
+.slider:before {
+	content: "";
+	display: block;
+	position: relative;
+	top: -0.5em;
+	width: 2em;
+	height: 2em;
+	margin-left: -1em;
+	border: solid 0.25em #fff;
+	border-radius: 1em;
+	background-color: inherit;
+	box-sizing: border-box;
+}
+/* display the value */
+.slider:after {
+	content: attr(data-value);
+	position: absolute;
+	top: -1.5em;
+	width: 2em;
+	line-height: 1em;
+	margin-left: -1em;
+	text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sliders">
+	<div class="slider">
+	</div>
+	<div class="slider">
+	</div>
+	<div class="slider">
+	</div>
+</div>
+
+</body>
+
+</html>

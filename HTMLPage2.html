@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Drag Drop Demo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.8/interact.min.js"></script>
+<style>
+.holder {
+	width: 500px;
+	height: 500px;
+}
+.dropzone {
+	background-color: #ccc;
+	padding: 10px;
+	width: 500px;
+	height: 200px;
+	border: dashed 4px transparent;
+	float: left;
+}
+.draggable {
+	width: 100px;
+	height: 100px;
+	float: left;
+	background-color: #2196F3;
+	color: white;
+	padding: 10px;
+	margin: 10px;
+}
+.drop-active {
+	border-color: #aaa;
+}
+.drop-target {
+	background-color: #000;
+	color: #FFF;
+	border-color: #fff;
+	border-style: solid;
+}
+</style>
+</head>
+
+<body>
+
+<div class="holder">
+	<div id="box-one" class="draggable">
+		<p>I am the first Box </p>
+	</div>
+	<div id="box-two" class="draggable">
+		<p>I am the second Box </p>
+	</div>
+	<br>
+	<div id="dropzone" class="dropzone">
+		You can drop the boxes here</div>
+</div>
+<script>
+interact('.draggable')  
+  .draggable({
+    // enable inertial throwing
+    inertia: true,
+    // keep the element within the area of it's parent
+    restrict: {
+      restriction: "parent",
+      endOnly: true,
+      elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+    },
+    // enable autoScroll
+    autoScroll: true,
+    // call this function on every dragmove event
+    onmove: dragMoveListener,
+  });
+
+  function dragMoveListener (event) {
+    var target = event.target,
+        // keep the dragged position in the data-x/data-y attributes
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+    // translate the element
+    target.style.webkitTransform =
+    target.style.transform =
+      'translate(' + x + 'px, ' + y + 'px)';
+
+    // update the posiion attributes
+    target.setAttribute('data-x', x);
+    target.setAttribute('data-y', y);
+  }
+
+// enable draggables to be dropped into this
+interact('.dropzone').dropzone({  
+  // Require a 50% element overlap for a drop to be possible
+  overlap: 0.50,
+
+  // listen for drop related events:
+
+  ondropactivate: function (event) {
+    // add active dropzone feedback
+    event.target.classList.add('drop-active');
+  },
+  ondragenter: function (event) {
+    var draggableElement = event.relatedTarget,
+        dropzoneElement = event.target;
+
+    // feedback the possibility of a drop
+    dropzoneElement.classList.add('drop-target');
+  },
+  ondragleave: function (event) {
+    // remove the drop feedback style
+    event.target.classList.remove('drop-target');
+  },
+  ondrop: function (event) {
+    event.relatedTarget.textContent = 'Dropped';
+  },
+  ondropdeactivate: function (event) {
+    // remove active dropzone feedback
+    event.target.classList.remove('drop-active');
+    event.target.classList.remove('drop-target');
+  }
+});
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "mod-pos",
+  "version": "0.0.0",
+  "description": "modPos",
+  "main": "server.js",
+  "author": {
+    "name": ""
+  },
+  "dependencies": {
+    "interactjs": "^1.9.14",
+    "requirejs": "^2.3.6"
+  }
+}
