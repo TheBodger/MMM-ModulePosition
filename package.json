@@ -1,13 +1,25 @@
 {
-  "name": "mod-pos",
-  "version": "0.0.0",
-  "description": "modPos",
-  "main": "server.js",
-  "author": {
-    "name": ""
+  "name": "MMM-ModulePosition",
+  "version": "1.0.0",
+  "description": "Magic Mirror Module for positioning modules in an absolute manner",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheBodger/MMM-ModulePosition"
   },
-  "dependencies": {
-    "interactjs": "^1.9.14",
-    "requirejs": "^2.3.6"
-  }
+  "author": {
+    "name": "N Scott"
+  },
+  "keywords": [
+    "magic mirror",
+    "smart mirror",
+    "JSON Feeds",
+    "Chart Display",
+    "module"
+  ],
+  "dependencies": {},
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TheBodger/MMM-ModulePosition/issues"
+  },
+  "homepage": "https://github.com/TheBodger/MMM-ModulePosition#readme"
 }

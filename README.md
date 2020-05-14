@@ -1,4 +1,4 @@
-# modPos
+# ModulePosition
 
 when all modules dom objects loaded
 
