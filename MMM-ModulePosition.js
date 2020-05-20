@@ -9,6 +9,8 @@
 
 var startTime = new Date(); //use for getting elapsed times during debugging
 var interactmodules = {};
+var theCanvas;
+var currentelement;
 
 
 Module.register("MMM-ModulePosition", {
@@ -40,16 +42,23 @@ Module.register("MMM-ModulePosition", {
 		this.interval = 1000 / this.config.FPS; //how long each frame lasts for
 
 		//TODO - support null canvasid = viewable window
-		this.theCanvas = document.getElementById(this.config.canvasid);
+		if (this.config.canvasid.toLowerCase() == 'body') {
+			theCanvas = document.body;
+		}
+		else {
+			theCanvas = document.getElementById(this.config.canvasid);
+		}
+		
 
 		//some working variables that are used during dragging/resizing
-		this.currentelement;
 
 		this.timers = {};
 		this.timer = null;;
 
 		this.dragging = false;
 		this.resizing = false;
+
+		var self = this;
 
 	},
 
@@ -154,14 +163,20 @@ Module.register("MMM-ModulePosition", {
 
 	makedraggable: function (element) {
 
+		var self = this;
+
+		https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
+
 		element.classList.add("drag");
-		element.addEventListener("mousedown", this.mouseDownListener, false);
+		element.addEventListener("mousedown", function () { self.mouseDownListener(self, event) }, false);
 
 		this.setmeta(element, this.getcurrentmeta(element), this.getcurrentmeta(element), { x: 0, y: 0, w: 0, h: 0 });
 	
 	},
 
 	makeresizable: function (element) {
+
+		var self = this;
 
 		element.classList.add("resizable");
 
@@ -185,10 +200,10 @@ Module.register("MMM-ModulePosition", {
 		divbr.classList.add("bottom-right");
 		element.appendChild(divbr);
 
-		divtl.addEventListener("mousedown", this.mouseDownListener, false);
-		divtr.addEventListener("mousedown", this.mouseDownListener, false);
-		divbl.addEventListener("mousedown", this.mouseDownListener, false);
-		divbr.addEventListener("mousedown", this.mouseDownListener, false);
+		divtl.addEventListener("mousedown", function () { self.mouseDownListener(self, event) }, false);
+		divtr.addEventListener("mousedown", function () { self.mouseDownListener(self, event) }, false);
+		divbl.addEventListener("mousedown", function () { self.mouseDownListener(self, event) }, false);
+		divbr.addEventListener("mousedown", function () { self.mouseDownListener(self, event) }, false);
 
 		this.setmeta(element, this.getcurrentmeta(element), this.getcurrentmeta(element), { x: 0, y: 0, w: 0, h: 0 });
 
@@ -196,61 +211,61 @@ Module.register("MMM-ModulePosition", {
 
 	//functions to drag,resize,end drag, resize
 
-	mouseDownListener: function (event) {
+	mouseDownListener: function (self,event) {
 
 		//try and stop a resizer click from bubbling up to the parent and vice versa
 
 		event.stopPropagation();
 
-		var mouse = this.getmouseposition(event);
+		var mouse = self.getmouseposition(event);
 
 		var mouseX = mouse.mouseX;
 		var mouseY = mouse.mouseY;
 
 		//determine if we are dragging or resizing
 
-		this.dragging = true;	//we found something to drag 
+		self.dragging = true;	//we found something to drag 
 								//this should always be true as the mousedown events are only linked to draggable and re-sizable elements
 
 		//but, if there is an outstanding timer, (about to be orphaned) , don't let the action start
 		if (Object.keys(this.timers).length > 0) {
-			this.dragging = false;
+			self.dragging = false;
 		}
 
-		if (this.dragging) {
+		if (self.dragging) {
 
-			event.target.removeEventListener("mousedown", this.mouseDownListener, false);
+			event.target.removeEventListener("mousedown", self.mouseDownListener, false);
 
 			//determine who we are dealing with
 
-			var element = this.getelement(event.target);
-			var parentelement = this.getelement(event.target, true);
+			var element = self.getelement(event.target);
+			var parentelement = self.getelement(event.target, true);
 
 			//check if we are actually resizing 
 
 			if (element != parentelement) {
-				this.resizing = true;
+				self.resizing = true;
 			}
 
-			if (!this.resizing) {
+			if (!self.resizing) {
 				document.body.style.cursor = "move";
 			};
 
 			//store the current element
 			currentelement = element;
 
-			window.addEventListener("mousemove", this.mouseMoveListener, false);
-			window.addEventListener("mouseup", this.mouseUpListener, false);
+			window.addEventListener("mousemove", function () { self.mouseMoveListener(self, event) }, false);
+			window.addEventListener("mouseup", function () { self.mouseUpListener(self, event) }, false);
 
 			//store the current mouse position
-			this.setmousemeta(element, { x: mouseX, y: mouseY, deltaX: 0, deltaY: 0 });
+			self.setmousemeta(element, { x: mouseX, y: mouseY, deltaX: 0, deltaY: 0 });
 
 			//adjust the element target to be same as location (it should be anyway)
-			var currentmeta = this.getmeta((this.resizing) ? parentelement : element);
-			this.setmeta((this.resizing) ? parentelement : element, currentmeta.current, currentmeta.current, currentmeta.step);
+			var currentmeta = self.getmeta((self.resizing) ? parentelement : element);
+			self.setmeta((self.resizing) ? parentelement : element, currentmeta.current, currentmeta.current, currentmeta.step);
 
-			this.timer = setInterval(this.onTimerTick, 1000 / this.config.interval);
-			this.timers[this.timer] = this.timer;
+			self.timer = setInterval(function () { self.onTimerTick(self) }, 1000 / self.config.interval);
+			self.timers[self.timer] = self.timer;
 
 			//code below prevents the mouse down from having an effect on the main browser window:
 			if (event.preventDefault) {
@@ -263,7 +278,7 @@ Module.register("MMM-ModulePosition", {
 		}
 	},
 
-	mouseMoveListener: function(event) {
+	mouseMoveListener: function (self,event) {
 
 		//work out the delta of mouse
 		//new mouse becomes target
@@ -272,22 +287,21 @@ Module.register("MMM-ModulePosition", {
 		//because we are moving we stick with the current element and dont try to determine who we are moving over
 		//otherwise the mouseover finds another valid element
 
-		var element = currentelement; //was getelement(event.target);
+		var element = currentelement; 
 
 		//resizing works differently to dragging so we have to split the repositioning and clamping
 
-		if (this.resizing) {
-
-			var currentmeta = this.getmeta(element.parentElement);
+		if (self.resizing) {
+			var currentmeta = self.getmeta(element.parentElement);
 		}
 		else {
-			var currentmeta = this.getmeta(element);
+			var currentmeta = self.getmeta(element);
 		}
 
 		var checkmeta = { target: currentmeta.target };
 
 		//get new mouse position
-		var mouse = this.getmouseposition(event);
+		var mouse = self.getmouseposition(event);
 		var mouseX = mouse.mouseX;
 		var mouseY = mouse.mouseY;
 
@@ -298,25 +312,25 @@ Module.register("MMM-ModulePosition", {
 		//otherwise clamp the delta to a value to adhere to the above rule
 
 		//mouse delta, try this first
-		var deltaX = mouseX - this.getmousemeta(element).mousemeta.x;
-		var deltaY = mouseY - this.getmousemeta(element).mousemeta.y;
+		var deltaX = mouseX - self.getmousemeta(element).mousemeta.x;
+		var deltaY = mouseY - self.getmousemeta(element).mousemeta.y;
 
-		if (this.resizing) {
+		if (self.resizing) {
 
 			//calculate the new element size and centre
-			checkmeta.target = this.getresizedelement(element, deltaX, deltaY, true);
+			checkmeta.target = self.getresizedelement(element, deltaX, deltaY, true);
 
 		}
 
 		//calculate the bounds based on the new target size 
 		var minX = (checkmeta.target.w / 2);
-		var maxX = (((this.theCanvas.clientWidth == 0) ? window.innerWidth : this.theCanvas.clientWidth) - (checkmeta.target.w / 2));
+		var maxX = (((theCanvas.clientWidth == 0) ? window.innerWidth : theCanvas.clientWidth) - (checkmeta.target.w / 2));
 		var minY = (checkmeta.target.h / 2);
-		var maxY = (((this.theCanvas.clientHeight == 0) ? window.innerHeight : this.theCanvas.clientHeight) - (checkmeta.target.h / 2));
+		var maxY = (((theCanvas.clientHeight == 0) ? window.innerHeight : theCanvas.clientHeight) - (checkmeta.target.h / 2));
 
 		//check the centre fits within the bounds
 
-		if (this.resizing) {
+		if (self.resizing) {
 			//checkmax returns a -value if out of bounds
 			//checkmin returns a +value if out of bounds
 			var checkmaxX = (maxX - checkmeta.target.x);
@@ -338,17 +352,17 @@ Module.register("MMM-ModulePosition", {
 		mouseY = mouseY + ((checkminY > 0) ? checkminY : 0) + ((checkmaxY < 0) ? checkmaxY : 0);
 
 		//recalculate the mouse delta based on the revised mouse position
-		var deltaX = mouseX - this.getmousemeta(element).mousemeta.x;
-		var deltaY = mouseY - this.getmousemeta(element).mousemeta.y;
+		var deltaX = mouseX - self.getmousemeta(element).mousemeta.x;
+		var deltaY = mouseY - self.getmousemeta(element).mousemeta.y;
 
 		//store the new mouse location
-		this.setmousemeta(element, { x: mouseX, y: mouseY, deltaX: deltaX, deltaY: deltaY });
+		self.setmousemeta(element, { x: mouseX, y: mouseY, deltaX: deltaX, deltaY: deltaY });
 
-		if (resizing)
+		if (self.resizing)
 		//store the new target
 		{
-			currentmeta.target = this.getresizedelement(element, deltaX, deltaY);
-			this.setmeta(element.parentElement, currentmeta.current, currentmeta.target, currentmeta.step);
+			currentmeta.target = self.getresizedelement(element, deltaX, deltaY);
+			self.setmeta(element.parentElement, currentmeta.current, currentmeta.target, currentmeta.step);
 		}
 		else {
 			//store the new mouse location
@@ -358,19 +372,19 @@ Module.register("MMM-ModulePosition", {
 			currentmeta.target.y = (currentmeta.target.y + deltaY);
 
 			//store the new target
-			this.setmeta(element, currentmeta.current, currentmeta.target, currentmeta.step);
+			self.setmeta(element, currentmeta.current, currentmeta.target, currentmeta.step);
 		}
 
 	},
 
-	mouseUpListener: function(event) {
+	mouseUpListener: function (self,event) {
 
 		//because we were moving we stick with the current element and dont try to determine who we are moving over
 		//otherwise the mouseover finds another valid dragme and attachs the mouse down to the wrong element
 		var element = currentelement;
 
-		element.addEventListener("mousedown", this.mouseDownListener, false);
-		window.removeEventListener("mouseup", this.mouseUpListener, false);
+		element.addEventListener("mousedown", function () { self.mouseDownListener(self, event) }, false);
+		window.removeEventListener("mouseup", self.mouseUpListener, false);
 		if (this.dragging) {
 			this.dragging = false;
 			if (this.resizing) {
@@ -390,12 +404,12 @@ Module.register("MMM-ModulePosition", {
 		if(element.classList.contains('bottom-right')) {
 			const width = currentmeta.target.w + deltaX;
 			const height = currentmeta.target.h + deltaY;
-			if (width > minimum_size) {
+			if (width > this.config.minimum_size) {
 				tempmeta.w = width;
 				tempmeta.x = currentmeta.target.x + (deltaX / 2);
 
 			}
-			if (height > minimum_size) {
+			if (height > this.config.minimum_size) {
 				tempmeta.h = height;
 				tempmeta.y = currentmeta.target.y + (deltaY / 2);
 			}
@@ -404,11 +418,11 @@ Module.register("MMM-ModulePosition", {
 		else if (element.classList.contains('bottom-left')) {
 			const height = currentmeta.target.h + deltaY;
 			const width = currentmeta.target.w - deltaX;
-			if (height > minimum_size) {
+			if (height > this.config.minimum_size) {
 				tempmeta.h = height;
 				tempmeta.y = currentmeta.target.y + (deltaY / 2);
 			}
-			if (width > minimum_size) {
+			if (width > this.config.minimum_size) {
 				tempmeta.w = width;
 				tempmeta.x = currentmeta.target.x + (deltaX / 2);
 			}
@@ -417,11 +431,11 @@ Module.register("MMM-ModulePosition", {
 		else if (element.classList.contains('top-right')) {
 			const width = currentmeta.target.w + deltaX;
 			const height = currentmeta.target.h - deltaY;
-			if (width > minimum_size) {
+			if (width > this.config.minimum_size) {
 				tempmeta.w = width;
 				tempmeta.x = currentmeta.target.x + (deltaX / 2);
 			}
-			if (height > minimum_size) {
+			if (height > this.config.minimum_size) {
 				tempmeta.h = height;
 				tempmeta.y = currentmeta.target.y + (deltaY / 2);
 
@@ -431,11 +445,11 @@ Module.register("MMM-ModulePosition", {
 		else {//top-left
 			const width = currentmeta.target.w - deltaX;
 			const height = currentmeta.target.h - deltaY;
-			if (width > minimum_size) {
+			if (width > this.config.minimum_size) {
 				tempmeta.w = width;
 				tempmeta.x = currentmeta.target.x + (deltaX / 2);
 			}
-			if (height > minimum_size) {
+			if (height > this.config.minimum_size) {
 				tempmeta.h = height;
 				tempmeta.y = currentmeta.target.y + (deltaY / 2);
 			}
@@ -452,19 +466,19 @@ Module.register("MMM-ModulePosition", {
 
 	},
 
-	onTimerTick: function () {
+	onTimerTick: function (self) {
 
 		//get the correct element to action
 
-		var actionelement = (this.resizing) ? currentelement.parentElement : currentelement;
+		var actionelement = (self.resizing) ? currentelement.parentElement : currentelement;
 
-		var currentmeta = this.getmeta(actionelement);
+		var currentmeta = self.getmeta(actionelement);
 
 		//calculate the step
-		currentmeta.step.x = this.config.easeAmount * (currentmeta.target.x - currentmeta.current.x);
-		currentmeta.step.y = this.config.easeAmount * (currentmeta.target.y - currentmeta.current.y);
-		currentmeta.step.w = this.config.easeAmount * (currentmeta.target.w - currentmeta.current.w);
-		currentmeta.step.h = this.config.easeAmount * (currentmeta.target.h - currentmeta.current.h);
+		currentmeta.step.x = self.config.easeAmount * (currentmeta.target.x - currentmeta.current.x);
+		currentmeta.step.y = self.config.easeAmount * (currentmeta.target.y - currentmeta.current.y);
+		currentmeta.step.w = self.config.easeAmount * (currentmeta.target.w - currentmeta.current.w);
+		currentmeta.step.h = self.config.easeAmount * (currentmeta.target.h - currentmeta.current.h);
 
 		//adjust the current location
 		currentmeta.current.x = currentmeta.current.x + currentmeta.step.x;
@@ -474,7 +488,7 @@ Module.register("MMM-ModulePosition", {
 
 		//stop the timer when the target position is reached (close enough)
 		if(
-			(!this.dragging) &&
+			(!self.dragging) &&
 				(Math.abs(currentmeta.current.x - currentmeta.target.x) < 0.1) &&
 				(Math.abs(currentmeta.current.y - currentmeta.target.y) < 0.1)
 				&&
@@ -489,13 +503,13 @@ Module.register("MMM-ModulePosition", {
 
 				//stop timer:
 
-			delete this.timers[this.timer];
+			delete self.timers[self.timer];
 
-			clearInterval(this.timer);
+			clearInterval(self.timer);
 		}
 
 		//save the new location
-		this.setmeta(actionelement, currentmeta.current, currentmeta.target, currentmeta.step)
+		self.setmeta(actionelement, currentmeta.current, currentmeta.target, currentmeta.step)
 
 		//move the element
 		actionelement.style.top = Math.round(currentmeta.current.y - (currentmeta.current.h / 2)).toString() + 'px';
@@ -607,7 +621,7 @@ Module.register("MMM-ModulePosition", {
 
 		var temp = { x: 0, y: 0, w: 0, h: 0 };
 
-		var trueoffset = getmouseposition({ clientX: element.offsetLeft, clientY: element.offsetTop });
+		//var trueoffset = getmouseposition({ clientX: element.offsetLeft, clientY: element.offsetTop });
 
 		temp.x = element.offsetLeft + element.getBoundingClientRect().width / 2;
 		temp.y = element.offsetTop + element.getBoundingClientRect().height / 2;
@@ -615,7 +629,7 @@ Module.register("MMM-ModulePosition", {
 		temp.w = element.getBoundingClientRect().width;
 		temp.h = element.getBoundingClientRect().height;
 
-	return temp;
+		return temp;
 
 	},
 
@@ -655,14 +669,13 @@ Module.register("MMM-ModulePosition", {
 		var defaultwidth = window.innerWidth;
 
 		//getting mouse position correctly 
-		var bRect = this.theCanvas.getBoundingClientRect();
-		mouseX = (mouseevent.clientX - bRect.left) * (((this.theCanvas.clientWidth == 0) ? defaultwidth : this.theCanvas.clientWidth) / ((bRect.width == 0) ? defaultwidth : bRect.width));
-		mouseY = (mouseevent.clientY - bRect.top) * (((this.theCanvas.clientHeight == 0) ? defaultheight : this.theCanvas.clientHeight) / ((bRect.height == 0) ? defaultheight : bRect.height));
+		var bRect = theCanvas.getBoundingClientRect();
+		mouseX = (mouseevent.clientX - bRect.left) * (((theCanvas.clientWidth == 0) ? defaultwidth : theCanvas.clientWidth) / ((bRect.width == 0) ? defaultwidth : bRect.width));
+		mouseY = (mouseevent.clientY - bRect.top) * (((theCanvas.clientHeight == 0) ? defaultheight : theCanvas.clientHeight) / ((bRect.height == 0) ? defaultheight : bRect.height));
 
 		return { mouseX: mouseX, mouseY: mouseY };
 
 	},
-
 
 });
 
