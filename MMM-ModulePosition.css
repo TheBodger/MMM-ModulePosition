@@ -2,9 +2,53 @@
     cursor:auto;
 
 }
+.resizable {
+    background: white;
+    position: absolute;
+    box-sizing: border-box;
+}
 
-.resize-drag {
-    background-color: rgba(255,255,255,.5);
+    .resizable .resizers {
+        width: 100%;
+        height: 100%;
+        border: 3px solid #4286f4;
+        box-sizing: border-box;
+    }
+
+    .resizable .resizer {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%; /*magic to turn square into circle*/
+        background: white;
+        border: 3px solid #4286f4;
+        position: absolute;
+    }
+
+        .resizable .resizer.top-left {
+            left: -5px;
+            top: -5px;
+            cursor: nwse-resize; /*resizer cursor*/
+        }
+
+        .resizable .resizer.top-right {
+            right: -5px;
+            top: -5px;
+            cursor: nesw-resize;
+        }
+
+        .resizable .resizer.bottom-left {
+            left: -5px;
+            bottom: -5px;
+            cursor: nesw-resize;
+        }
+
+        .resizable .resizer.bottom-right {
+            right: -5px;
+            bottom: -5px;
+            cursor: nwse-resize;
+        }
+.drag {
+    background-color: rgba(255,255,255,.25);
     color: white;
     font-size: 12px;
     font-family: sans-serif;
@@ -17,9 +61,10 @@
     border-color: rgba(255,255,255,.5);
     border-width: 4px;
     border-style: groove;
+    position:absolute;
 }
 
-.resize-drag:hover {
+.drag:hover {
     border-color: white;
     border-width: 4px;
     border-style: groove;
@@ -38,8 +83,6 @@ div {
     border-width: 1px;
     border-style:solid;
 }
-
-
 
 .glass {
     /* background styles */
