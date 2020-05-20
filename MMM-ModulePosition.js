@@ -8,6 +8,8 @@
  */
 
 var startTime = new Date(); //use for getting elapsed times during debugging
+var interactmodules = {};
+
 
 Module.register("MMM-ModulePosition", {
 
@@ -30,6 +32,8 @@ Module.register("MMM-ModulePosition", {
 
 		this.sendNotificationToNodeHelper("STATUS", this.identifier);
 
+		this.moduletracking = {};
+
 	},
 
 	showElapsed: function () {
@@ -47,7 +51,7 @@ Module.register("MMM-ModulePosition", {
 		return [
 			'moment.js',
 			'https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.8/interact.min.js',
-			'configscripts.js',
+			//'configscripts.js',
 			'interactscripts.js',
 		]
 	},
@@ -68,11 +72,11 @@ Module.register("MMM-ModulePosition", {
 			Log.log(self.identifier + " " + this.name + " received a system notification: " + notification);
 		}
 
-		if (notification == 'ALL_MODULES_STARTED') {
+		if (notification == 'DOM_OBJECTS_CREATED') {
 
 			// start amending the current DOM to add the drag and resize Class
 
-			this.addclass();
+			this.setupconfig();
 
 		}
 
@@ -84,25 +88,115 @@ Module.register("MMM-ModulePosition", {
 
 	},
 
-	addclass: function () {
+	setupconfig: function () {
 
 		//get all the modules
+		//set up instances based on the identifier
+		//make explicit where the entry is within the config array of modules so 
+		//if multpiple entries of the same type are found we can track this and where we write back into the 
+		//copy of the config
 
-		var allmodules = MM.getModules();
+		//need a tracking list called moduletracking of modules based on the module identifier
+		//use position to determine if we ignore it when setting up the classes on the divs
+		//name is the MMM- or defaults type of module
 
-    },
+		//{identifier:{index:index in modules array,duplicate:false,ignore:false,name:'',modpos:{modpos}}}
+
+		var self = this;
+
+		MM.getModules().forEach(function (module, index) {
+			self.moduletracking[module.identifier] = {};
+			self.moduletracking[module.identifier]['index'] = index;
+			self.moduletracking[module.identifier]['ignore'] = (module.name == self.name || module.data.position == null || module.data.position == 'fullscreen_above' || module.data.position == 'fullscreen_below');
+			self.moduletracking[module.identifier]['duplicate'] = self.isduplicatemodule(module.name);
+			self.moduletracking[module.identifier]['name'] = module.name; // add after check for duplicate
+			self.moduletracking[module.identifier]['modpos'] = { modpos: { x: 0, y: 0, w: 0, h: 0 } };;
+		});
+
+		//now we search the completed dom module looking for all the divs we need to amend
+
+		for (var module in self.moduletracking) {
+
+			if (!self.moduletracking[module].ignore) {
+
+				var modulediv = document.getElementById(module);
+				modulediv.className = modulediv.className + " resize-drag"
+
+				//and we need to add a couple of events so we can track the mouse over the modules
+
+				//onmouseover = "bigImg(this)" onmouseout = "normalImg(this)"
+
+				modulediv.onmouseover = function () { self.showover() };
+				modulediv.onmouseout = function () { self.showout() };
+
+				//if we are cropping change the class to one with cropping on
+
+			}
+		}
+	},
+
+	showover: function () {
+
+		this.savebutton.innerText = "Over";
+
+	},
+	showout: function () {
+
+		this.savebutton.innerText = "Out";
+
+	},
+
+	isduplicatemodule: function (modulename) {
+		var isit = false;
+		for (identifier in this.moduletracking) {
+			isit = (this.moduletracking[identifier].name == modulename);
+			if (isit) { return isit; }
+		}
+
+		return isit;
+
+	},
 
 	getDom: function () {
+
 		//only define the wrapper once as the chart will do the business
 		//inside it
-
+		var self = this;
 		var wrapper = document.createElement("div");
 		wrapper.classname = "currentmodulemeta";
 		wrapper.id = "currentmodulemeta";
-		wrapper.innerHTML = '<a id="save-button" class="save-button glass" href="#" onclick="saveFunction()">Save </a>';
+		this.savebutton = document.createElement("a");
+		this.savebutton.className = 'save-button glass';
+		this.savebutton.id = 'save-button';
+		this.savebutton.href = '#';
+		this.savebutton.onclick =  function() { self.saveFunction() };
+
+		wrapper.appendChild(this.savebutton);
 
 		return wrapper;
 	},
+
+	saveFunction: function() {
+
+		console.log("saving config");
+		console.log(document.getElementById('save-button').innerText);
+		console.log(this.moduletracking);
+		console.log(interactmodules);
+
+
+	//we want to save a revised config with the new modpos values
+	//as opposed to using CSS ?? 
+	//it is more flexible (if modpos exists, use them to setup the position of the class/module name)
+	//though CSS might be a good way to do it initially 
+	//so
+	//can we read the custom.css to merge the new details as a module css entry 
+	//or overwrite an existing one
+
+	//here we will need to write the file out useing the nodehelper
+	// custom.css.timestamp
+	// config.js.timestamp
+
+},
 
 	sendNotificationToNodeHelper: function (notification, payload) {
 		this.sendSocketNotification(notification, payload);

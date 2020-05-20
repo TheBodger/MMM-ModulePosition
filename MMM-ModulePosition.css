@@ -1,21 +1,29 @@
-﻿body /* turn on cursor */
-{
+﻿html {
+    cursor:auto;
+
 }
 
 .resize-drag {
-    background-color: #29e;
+    background-color: rgba(255,255,255,.5);
     color: white;
     font-size: 12px;
     font-family: sans-serif;
     border-radius: 8px;
     padding: 20px;
     touch-action: none;
-    width: 120px;
+    /*width: 120px;*/
     /* This makes things *much* easier */
     box-sizing: border-box;
-
+    border-color: rgba(255,255,255,.5);
+    border-width: 4px;
+    border-style: groove;
 }
 
+.resize-drag:hover {
+    border-color: white;
+    border-width: 4px;
+    border-style: groove;
+}
 .currentmodulemeta{
     position:absolute;
     background-color:rgba(0,0,0,0);
@@ -25,11 +33,13 @@
     left:0px;
 }
 
-.resize-drag:hover {
+div {
     border-color: white;
-    border-width: 4px;
-    border-style: groove;
+    border-width: 1px;
+    border-style:solid;
 }
+
+
 
 .glass {
     /* background styles */
@@ -60,6 +70,6 @@
     background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.2));
 }
 
-    .glass:hover {
-        background: linear-gradient(orange,white);
-    }
+.glass:hover {
+    background: linear-gradient(orange,white);
+}

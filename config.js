@@ -49,11 +49,17 @@ var config = {
 			module: "clock",
 			position: "top_left",
 			config: {
-				displayType: "both",
+				displayType: "digital",
 
 			}
 		},
-
+		{
+			module: "clock",
+			position: "top_right",
+			config: {
+				displayType: "analog",
+			}
+		},
 		{
 			module: "compliments",
 			position: "lower_third",
