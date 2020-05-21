@@ -12,7 +12,6 @@ var interactmodules = {};
 var theCanvas;
 var currentelement;
 
-
 Module.register("MMM-ModulePosition", {
 
 	// Default module config.
@@ -165,8 +164,6 @@ Module.register("MMM-ModulePosition", {
 
 		var self = this;
 
-		https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
-
 		element.classList.add("drag");
 		element.addEventListener("mousedown", function () { self.mouseDownListener(self, event) }, false);
 
@@ -240,6 +237,24 @@ Module.register("MMM-ModulePosition", {
 
 			var element = self.getelement(event.target);
 			var parentelement = self.getelement(event.target, true);
+
+			//pop the div to the top level so absolute actual works
+			//and make it absolute here so we have correct initial positioning
+			//before we do this we set the location so it doesn't jump around the screen
+			//and we get the latest values for w/h/x/y because they have changed since last we were here for this element
+
+			self.setmeta(parentelement, self.getcurrentmeta(parentelement), self.getcurrentmeta(parentelement), { x: 0, y: 0, w: 0, h: 0 })
+			var currentmeta = self.getmeta(parentelement);
+
+			//move the element
+			parentelement.style.top = Math.round(currentmeta.current.y - (currentmeta.current.h / 2)).toString() + 'px';
+			parentelement.style.left = Math.round(currentmeta.current.x - (currentmeta.current.w / 2)).toString() + 'px';
+
+			parentelement.style.width = Math.round(currentmeta.current.w).toString() + 'px';
+			parentelement.style.height = Math.round(currentmeta.current.h).toString() + 'px';
+
+			parentelement.style.position = 'absolute';
+			document.body.append(parentelement);
 
 			//check if we are actually resizing 
 
@@ -623,8 +638,8 @@ Module.register("MMM-ModulePosition", {
 
 		//var trueoffset = getmouseposition({ clientX: element.offsetLeft, clientY: element.offsetTop });
 
-		temp.x = element.offsetLeft + element.getBoundingClientRect().width / 2;
-		temp.y = element.offsetTop + element.getBoundingClientRect().height / 2;
+		temp.x = -parseFloat(theCanvas.style.marginLeft.replace('px', '')) + (element.getBoundingClientRect().left + element.getBoundingClientRect().width / 2);
+		temp.y = -parseFloat(theCanvas.style.marginTop.replace('px', '')) + (element.getBoundingClientRect().top + element.getBoundingClientRect().height / 2);
 
 		temp.w = element.getBoundingClientRect().width;
 		temp.h = element.getBoundingClientRect().height;
@@ -632,7 +647,6 @@ Module.register("MMM-ModulePosition", {
 		return temp;
 
 	},
-
 
 	//get the actual element not the resizer
 	getelement:function (element, getparent = false) {
