@@ -58,44 +58,44 @@ var resizing = false;
 
 function setmeta(element, current, target, step) {
 
-element.dataset.meta = JSON.stringify({ current: current, target: target, step: step });
+	element.dataset.meta = JSON.stringify({ current: current, target: target, step: step });
 	
 }
 
 function setmousemeta(element, mousemeta) {
-element.dataset.mousemeta = JSON.stringify({ mousemeta: mousemeta });
+	element.dataset.mousemeta = JSON.stringify({ mousemeta: mousemeta });
 }
 
 function getmeta(element) {
 
-return JSON.parse(element.dataset.meta);
-//({ current: current, target: target, step: step });
+	return JSON.parse(element.dataset.meta);
+	//({ current: current, target: target, step: step });
 
 }
 
 function getmousemeta(element) {
 
-return JSON.parse(element.dataset.mousemeta);
+	return JSON.parse(element.dataset.mousemeta);
 
 }
 
 function getcurrentmeta(element) {
 
+	//adjust the x,y to the centre of the element
+	//x,y this is its apparent absolute position, manually taking  into account margins etc
+	//we know this is relative to the body 
 
-//adjust the x,y to the centre of the element
-//x,y this is its apparent absolute position, taking into account margins etc
+	var temp = { x: 0, y: 0, w: 0, h: 0 };
 
-var temp = { x: 0, y: 0, w: 0, h: 0 };
+	var trueoffset = getmouseposition({ clientX: element.offsetLeft, clientY: element.offsetTop });
 
-var trueoffset = getmouseposition({ clientX: element.offsetLeft, clientY: element.offsetTop });
+	temp.x = -parseFloat(this.theCanvas.style.marginLeft.replace('px','')) + (element.getBoundingClientRect().left + element.getBoundingClientRect().width / 2);
+	temp.y = -parseFloat(this.theCanvas.style.marginTop.replace('px', '')) + (element.getBoundingClientRect().top  + element.getBoundingClientRect().height / 2);
 
-temp.x = element.offsetLeft + element.getBoundingClientRect().width / 2;
-temp.y = element.offsetTop  + element.getBoundingClientRect().height / 2;
+	temp.w = element.getBoundingClientRect().width;
+	temp.h = element.getBoundingClientRect().height;
 
-temp.w = element.getBoundingClientRect().width;
-temp.h = element.getBoundingClientRect().height;
-
-return  temp;
+	return  temp;
 
 }
 
@@ -104,8 +104,16 @@ function makedraggable(element) {
 	element.classList.add("dragme");
 	element.addEventListener("mousedown", mouseDownListener, false);
 
-	setmeta(element, getcurrentmeta(element), getcurrentmeta(element), {x:0,y:0,w:0,h:0});
+	setmeta(element, getcurrentmeta(element), getcurrentmeta(element), { x: 0, y: 0, w: 0, h: 0 });
+
+	window.addEventListener("mousemove",showposition, false);
 	
+}
+
+function showposition(event) {
+
+	console.log(event.pageX, event.pageY);
+
 }
 
 function makeresizable(element) {
@@ -210,12 +218,30 @@ function mouseDownListener(event) {
 
 	if (dragging) {
 
-		event.target.removeEventListener("mousedown", mouseDownListener, false);
+		event.currentTarget.removeEventListener("mousedown", mouseDownListener, false);
 
 		//determine who we are dealing with
 
-		var element = getelement(event.target);
-		var parentelement = getelement(event.target, true);
+		var element = getelement(event.currentTarget);
+		var parentelement = getelement(event.currentTarget, true);
+
+		//pop the div to the top level so absolute actual works
+		//and make it absolute here so we have correct initial positioning
+		//before we do this we set the location so it doesn't jump around the screen
+		//and we get the latest values for w/h/x/y because they have changed since last we were here for this element
+
+		setmeta(parentelement,getcurrentmeta(parentelement), getcurrentmeta(parentelement), {x:0,y:0,w:0,h:0})
+		var currentmeta = getmeta(parentelement);
+
+		//move the element
+		parentelement.style.top = Math.round(currentmeta.current.y - (currentmeta.current.h / 2)).toString() + 'px';
+		parentelement.style.left = Math.round(currentmeta.current.x - (currentmeta.current.w / 2)).toString() + 'px';
+
+		parentelement.style.width = Math.round(currentmeta.current.w).toString() + 'px';
+		parentelement.style.height = Math.round(currentmeta.current.h).toString() + 'px';
+
+		parentelement.style.position = 'absolute';
+		document.body.append(parentelement);
 
 		//check if we are actually resizing 
 
@@ -237,7 +263,7 @@ function mouseDownListener(event) {
 		setmousemeta(element, { x: mouseX, y: mouseY, deltaX: 0, deltaY: 0 });
 
 		//adjust the element target to be same as location (it should be anyway)
-		var currentmeta = getmeta((resizing) ? parentelement : element);
+		currentmeta = getmeta((resizing) ? parentelement : element);
 		setmeta((resizing) ? parentelement :element, currentmeta.current, currentmeta.current, currentmeta.step);
 
 		timer = setInterval(onTimerTick, 1000 / interval);
@@ -352,22 +378,6 @@ function mouseMoveListener(event) {
 		//store the new target
 		setmeta(element, currentmeta.current, currentmeta.target, currentmeta.step);
 	}
-
-
-
-	bounddiv.style.left = minX + "px";
-	bounddiv.style.top = minY + "px";
-	bounddiv.style.width = maxX - minX + "px";
-	bounddiv.style.height = maxY - minY + "px";
-	//bounddiv.style.visibility = "visible";
-	bounddiv.style.color = "pink";
-	bounddiv.innerHTML = `${minX}<br>${minY}<br>${maxX}<br>${maxY}<br>${checkmeta.target.x}<br>${checkmeta.target.y}<br>DX${deltaX}<br>DY${deltaY}<br>`
-
-	xydiv.style.left = checkmeta.target.x + "px";
-	xydiv.style.top = checkmeta.target.y + "px";
-	xydiv.style.visibility = "visible";
-	bounddiv.innerHTML += `${checkmaxX}<br>${checkmaxY}<br>${checkminX}<br>${checkminY}`
-
 }
 
 function getresizedelement(element, deltaX, deltaY,roundvalues=false) {
@@ -520,354 +530,3 @@ function mouseUpListener(event) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-////global element that contains All elements
-
-//var theCanvas = document.getElementById("canvasOne");
-//var dragging = false;
-
-//var targetX;
-//var targetY;
-//var targetH;
-//var targetW;
-
-
-///*Make resizable div by Hung Nguyen*/
-//function makeResizableDiv(div) {
-
-//	const element = document.querySelector(div);
-//	const resizers = document.querySelectorAll(div + ' .resizer')
-
-//	const minimum_size = 20;
-//	let original_width = 0;
-//	let original_height = 0;
-//	let original_x = 0;
-//	let original_y = 0;
-//	let original_mouse_x = 0;
-//	let original_mouse_y = 0;
-
-
-//	for (let i = 0; i < resizers.length; i++) { //for each of the handles in resizable
-//		const currentResizer = resizers[i];
-//		currentResizer.addEventListener('mousedown', function (e) {
-//			e.preventDefault()
-//			//getting mouse position correctly 
-//			var bRect = theCanvas.getBoundingClientRect();
-//			mouseX = (e.clientX - bRect.left) * (theCanvas.clientWidth / bRect.width);
-//			mouseY = (e.clientY - bRect.top) * (theCanvas.clientHeight / bRect.height);
-
-//			original_width = parseFloat(getComputedStyle(element, null).getPropertyValue('width').replace('px', ''));
-//			original_height = parseFloat(getComputedStyle(element, null).getPropertyValue('height').replace('px', ''));
-//			dragme.dataset.w = original_width;
-//			dragme.dataset.h = original_height;
-//			original_x = element.getBoundingClientRect().left;
-//			original_y = element.getBoundingClientRect().top;
-//			original_mouse_x = mouseX;
-//			original_mouse_y = mouseY;
-//			window.addEventListener('mousemove', resize)
-//			window.addEventListener('mouseup', stopResize)
-//			dragging = true;
-//			timer = setInterval(onTimerTick, 1000 / 30);
-//			//console.log("created resize timer ", timer);
-
-//		})
-
-//		function resize(e) {
-
-//			//as the dimensions increase, the calculation of the left /top need to take into account the change as
-//			//these represent the middle of the element
-
-//			//getting mouse position correctly 
-//			var bRect = theCanvas.getBoundingClientRect();
-//			mouseX = (e.clientX - bRect.left) * (theCanvas.clientWidth / bRect.width);
-//			mouseY = (e.clientY - bRect.top) * (theCanvas.clientHeight / bRect.height);
-
-//			var deltaX = (mouseX - original_mouse_x);
-//			var deltaY = (mouseY - original_mouse_y);
-
-//			//console.log('resize move', targetX, targetY, deltaX, deltaY);
-
-//			if (currentResizer.classList.contains('bottom-right')) {
-//				const width = original_width + deltaX;
-//				const height = original_height + deltaY;
-//				if (width > minimum_size) {
-//					//          element.style.width = width + 'px'
-//					dragme.dataset.w = width;
-//					dragme.dataset.x = original_x + (deltaX / 2);
-//				}
-//				if (height > minimum_size) {
-//					//          element.style.height = height + 'px'
-//					dragme.dataset.h = height;
-//					dragme.dataset.y = original_mouse_y + (deltaY / 2);
-//				}
-//			}
-//			else if (currentResizer.classList.contains('bottom-left')) {
-//				const height = original_height + deltaY;
-//				const width = original_width - deltaX;
-//				if (height > minimum_size) {
-//					//          element.style.height = height + 'px'
-//					dragme.dataset.h = height;
-//				}
-//				if (width > minimum_size) {
-//					//          element.style.width = width;
-//					dragme.dataset.w = width + 'px'
-//					//          element.style.left = original_x + (mouseX - original_mouse_x) + 'px'
-//					dragme.dataset.x = original_x + deltaX;
-//				}
-//			}
-//			else if (currentResizer.classList.contains('top-right')) {
-//				const width = original_width + (mouseX - original_mouse_x)
-//				const height = original_height - deltaY;
-//				if (width > minimum_size) {
-//					//          element.style.width = width + 'px'
-//					dragme.dataset.w = width + 'px'
-//				}
-//				if (height > minimum_size) {
-//					//          element.style.height = height + 'px'
-//					dragme.dataset.h = height;
-//					//          element.style.top = original_y + (mouseY - original_mouse_y) + 'px'
-//					dragme.dataset.y = original_y + deltaY;
-//				}
-//			}
-//			else {
-//				const width = original_width - deltaX;
-//				const height = original_height - deltaY;
-//				if (width > minimum_size) {
-//					//          element.style.width = width + 'px'
-//					dragme.dataset.w = width;
-//					//          element.style.left = original_x + (mouseX - original_mouse_x) + 'px'
-//					dragme.dataset.x = original_x + deltaX;
-//				}
-//				if (height > minimum_size) {
-//					//          element.style.height = height + 'px'
-//					dragme.dataset.h = height;
-//					//          element.style.top = original_y + (mouseY - original_mouse_y) + 'px'
-//					dragme.dataset.y = original_y + deltaY;
-//				}
-//			}
-
-
-//			targetX = dragme.dataset.x;
-//			targetY = dragme.dataset.y;
-//			targetH = dragme.dataset.h;
-//			targetW = dragme.dataset.w;
-
-
-//			//console.log("Resized", dragme.dataset);
-//		}
-
-//		function stopResize() {
-//			dragging = false;
-//			window.removeEventListener('mousemove', resize)
-//			window.removeEventListener('mouseup', stopResize)
-//		}
-//	}
-//}
-
-//makeResizableDiv('.dragme')
-
-
-
-//init();
-
-//var numShapes;
-//var shapes;
-//var dragIndex;
-////var dragging;
-//var mouseX;
-//var mouseY;
-//var dragHoldX;
-//var dragHoldY;
-//var timer;
-//var easeAmount;
-//var bgColor;
-
-//function init() {
-//	numShapes = 10;
-//	easeAmount = 0.65;
-
-//	bgColor = "#000000";
-
-//	theCanvas.addEventListener("mousedown", mouseDownListener, false);
-
-//	dragme.dataset.y = dragme.offsetTop + dragme.getBoundingClientRect().height / 2;
-//	dragme.dataset.x = dragme.offsetLeft + dragme.getBoundingClientRect().width / 2;
-
-//	dragme.dataset.w = dragme.getBoundingClientRect().width;
-//	dragme.dataset.h = dragme.getBoundingClientRect().height;
-
-//	targetX = parseInt(dragme.dataset.x);
-//	targetY = parseInt(dragme.dataset.y);
-
-//	targetW = parseInt(dragme.dataset.w);
-//	targetH = parseInt(dragme.dataset.h);
-
-//	dragme.style.position = "absolute";
-//}
-
-
-//function mouseDownListener(evt) {
-
-//	//make sure we have a dragme
-
-//	if (evt.target.id != 'dragme') { return; }
-
-//	var i;
-
-//	document.body.style.cursor = "move";
-
-//	//getting mouse position correctly 
-//	var bRect = theCanvas.getBoundingClientRect();
-//	mouseX = (evt.clientX - bRect.left) * (theCanvas.clientWidth / bRect.width);
-//	mouseY = (evt.clientY - bRect.top) * (theCanvas.clientHeight / bRect.height);
-
-//	//console.log('mouse down', mouseX, mouseY);
-
-//	dragging = true; //we found something to drag
-
-//	if (dragging) {
-//		window.addEventListener("mousemove", mouseMoveListener, false);
-
-//		//shape to drag is now last one in array. We read record the point on this object where the mouse is "holding" it:
-//		dragHoldX = mouseX - parseInt(dragme.dataset.x);
-//		dragHoldY = mouseY - parseInt(dragme.dataset.y);
-
-//		//The "target" position is where the object should be if it were to move there instantaneously. But we will
-//		//set up the code so that this target position is approached gradually, producing a smooth motion.
-//		targetX = mouseX - dragHoldX;
-//		targetY = mouseY - dragHoldY;
-
-//		//console.log('target down', targetX, targetY);
-
-//		//start timer
-//		timer = setInterval(onTimerTick, 1000 / 30);
-//		//console.log("created timer ", timer);
-//	}
-//	theCanvas.removeEventListener("mousedown", mouseDownListener, false);
-//	window.addEventListener("mouseup", mouseUpListener, false);
-
-//	//code below prevents the mouse down from having an effect on the main browser window:
-//	if (evt.preventDefault) {
-//		evt.preventDefault();
-//	} //standard
-//	else if (evt.returnValue) {
-//		evt.returnValue = false;
-//	} //older IE
-//	return false;
-//}
-
-//function onTimerTick() {
-//	/*
-//	Because of reordering, the dragging shape is the last one in the array.
-//	The code below moves this shape only a portion of the distance towards the current "target" position, and 
-//	because this code is being executed inside a function called by a timer, the object will continue to
-//	move closer and closer to the target position.
-//	The amount to move towards the target position is set in the parameter 'easeAmount', which should range between
-//	0 and 1. The target position is set by the mouse position as it is dragging.		
-//	*/
-
-//	(dragme.dataset.x) = parseInt(dragme.dataset.x) + easeAmount * (targetX - parseInt(dragme.dataset.x));
-//	(dragme.dataset.y) = parseInt(dragme.dataset.y) + easeAmount * (targetY - parseInt(dragme.dataset.y));
-
-//	(dragme.dataset.h) = parseInt(dragme.dataset.h) + easeAmount * (targetH - parseInt(dragme.dataset.h));
-//	(dragme.dataset.w) = parseInt(dragme.dataset.w) + easeAmount * (targetW - parseInt(dragme.dataset.w));
-
-//	//stop the timer when the target position is reached (close enough)
-//	//console.log("check for easing x,x,y,y,x=x,y=y",
-//		parseInt(dragme.dataset.x),
-//		targetX,
-//		parseInt(dragme.dataset.y),
-//		targetY,
-//		(Math.abs(parseInt(dragme.dataset.x) - targetX) < 1.1),
-//		(Math.abs(parseInt(dragme.dataset.y) - targetY) < 1.1));
-//	//console.log("check for easing w,w,w-w,w=w,h=h",
-//		parseInt(dragme.dataset.w),
-//		targetW,
-//		parseInt(dragme.dataset.w) - targetW,
-//		(Math.abs(parseInt(dragme.dataset.w) - targetW) < 1.1),
-//		(Math.abs(parseInt(dragme.dataset.h) - targetH) < 1.1));
-//	//console.log("check for easing h,h", parseInt(dragme.dataset.h), targetH);
-
-//	if ((!dragging) &&
-//		(Math.abs(parseInt(dragme.dataset.x) - targetX) < 1.1) && (Math.abs(parseInt(dragme.dataset.y) - targetY) < 1.1) &&
-//		(Math.abs(parseInt(dragme.dataset.h) - targetH) < 1.1) && (Math.abs(parseInt(dragme.dataset.w) - targetW) < 1.1)
-
-//	) {
-//		(dragme.dataset.x) = targetX;
-//		(dragme.dataset.y) = targetY;
-//		(dragme.dataset.h) = targetH;
-//		(dragme.dataset.w) = targetW;
-
-//		//stop timer:
-//		//console.log("clearing timer ", timer);
-//		clearInterval(timer);
-//	}
-
-//	if ((!dragging)) { //console.log("easing to end"); } else { "still draggin"; }
-
-//	//all positions relate to the centre of the element
-//	//for absolue positioning, adjust from centre to top left corner
-//	//which will be interesting as we can also resize
-
-//	//apply the width and height first as we use the actual measurments to determine the new position in the followign step
-
-//	dragme.style.width = parseInt(dragme.dataset.w) + 'px';
-//	dragme.style.height = parseInt(dragme.dataset.h) + 'px';
-
-//	//we adjust the actual position as we track x,y using the centre of the element
-
-//	//console.log("position x,w,newx", parseInt(dragme.dataset.x), dragme.getBoundingClientRect().width, (parseInt(dragme.dataset.y) - dragme.getBoundingClientRect().height / 2))
-
-//	dragme.style.top = (parseInt(dragme.dataset.y) - dragme.getBoundingClientRect().height / 2).toString() + 'px';
-//	dragme.style.left = (parseInt(dragme.dataset.x) - dragme.getBoundingClientRect().width / 2).toString() + 'px';
-//}
-
-//function mouseUpListener(evt) {
-//	theCanvas.addEventListener("mousedown", mouseDownListener, false);
-//	window.removeEventListener("mouseup", mouseUpListener, false);
-//	if (dragging) {
-//		dragging = false;
-//		document.body.style.cursor = "default"
-//		window.removeEventListener("mousemove", mouseMoveListener, false);
-//	}
-//}
-
-//function mouseMoveListener(evt) {
-//	var posX;
-//	var posY;
-
-//	var halfwidth = dragme.getBoundingClientRect().width / 2;
-//	var minX = halfwidth;
-//	var maxX = theCanvas.clientWidth - halfwidth;
-
-//	var halfheight = dragme.getBoundingClientRect().height / 2;
-//	var minY = halfheight;
-//	var maxY = theCanvas.clientHeight - halfheight;
-
-//	//getting mouse position correctly 
-//	var bRect = theCanvas.getBoundingClientRect();
-//	mouseX = (evt.clientX - bRect.left) * (theCanvas.clientWidth / bRect.width);
-//	mouseY = (evt.clientY - bRect.top) * (theCanvas.clientHeight / bRect.height);
-
-
-//	//clamp x and y positions to prevent object from dragging outside of canvas
-//	posX = mouseX - dragHoldX;
-//	posX = (posX < minX) ? minX : ((posX > maxX) ? maxX : posX);
-//	posY = mouseY - dragHoldY;
-//	posY = (posY < minY) ? minY : ((posY > maxY) ? maxY : posY);
-
-//	targetX = posX;
-//	targetY = posY;
-
-//	//console.log('target move', targetX, targetY);
-//}
