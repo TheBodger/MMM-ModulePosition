@@ -67,8 +67,11 @@ function getcurrentmeta(element) {
 
 	var trueoffset = getmouseposition({ clientX: element.offsetLeft, clientY: element.offsetTop });
 
-	temp.x = -parseFloat(this.theCanvas.style.marginLeft.replace('px','')) + (element.getBoundingClientRect().left + element.getBoundingClientRect().width / 2);
-	temp.y = -parseFloat(this.theCanvas.style.marginTop.replace('px', '')) + (element.getBoundingClientRect().top  + element.getBoundingClientRect().height / 2);
+	//get the style information 
+	var tempstyle = theCanvas.currentStyle || window.getComputedStyle(theCanvas);
+
+	temp.x = -parseFloat(tempstyle.marginLeft.replace('px', '')) + (element.getBoundingClientRect().left + element.getBoundingClientRect().width / 2);
+	temp.y = -parseFloat(tempstyle.marginTop.replace('px', '')) + (element.getBoundingClientRect().top + element.getBoundingClientRect().height / 2);
 
 	temp.w = element.getBoundingClientRect().width;
 	temp.h = element.getBoundingClientRect().height;
@@ -126,7 +129,7 @@ function getelement(element,getparent=false) {
 		return currentelement;
 	}
 
-	if (element.classList.contains('dragme')) {
+	if (element.classList.contains('drag')) {
 		return element;
 	}
 
@@ -167,7 +170,7 @@ function getmouseposition(mouseevent) {
 
 function mouseDownListener(event) {
 
-	//try and stop a resizer click from bubbling up to the parent and vice versa
+	//stop a resizer mousedown from bubbling up to the parent and vice versa
 
 	event.stopPropagation();
 
@@ -475,9 +478,6 @@ function onTimerTick() {
 }
 
 function mouseUpListener(event) {
-
-	bounddiv.style.visibility = "hidden";
-	xydiv.style.visibility = "hidden";
 
 	//because we were moving we stick with the current element and dont try to determine who we are moving over
 	//otherwise the mouseover finds another valid dragme and attachs the mouse down to the wrong element

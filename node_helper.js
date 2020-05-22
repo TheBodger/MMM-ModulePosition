@@ -17,13 +17,13 @@ var moment = require("moment");
 var LOG = require('../MMM-FeedUtilities/LOG');
 var RSS = require('../MMM-FeedUtilities/RSS');
 
-// get required structures and utilities
+//// get required structures and utilities
 
-const structures = require("../MMM-ChartUtilities/structures");
-const utilities = require("../MMM-ChartUtilities/common");
+//const structures = require("../MMM-ChartUtilities/structures");
+//const utilities = require("../MMM-ChartUtilities/common");
 
-const JSONutils = new utilities.JSONutils();
-const configutils = new utilities.configutils();
+//const JSONutils = new utilities.JSONutils();
+//const configutils = new utilities.configutils();
 
 module.exports = NodeHelper.create({
 

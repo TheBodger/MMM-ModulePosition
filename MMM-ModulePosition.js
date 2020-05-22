@@ -66,6 +66,7 @@ Module.register("MMM-ModulePosition", {
 	getScripts: function () {
 		return [
 			'moment.js',
+			'smoothpositioning.3.2.js'
 		]
 	},
 
@@ -155,10 +156,11 @@ Module.register("MMM-ModulePosition", {
 			}
 		}
 
+		//and finally we add the savebutton to the draggers
+
+		//makedraggable(document.getElementById('currentmodulemeta'));
+
 	},
-
-	
-
 
 	showover: function () {
 
@@ -188,11 +190,30 @@ Module.register("MMM-ModulePosition", {
 		var wrapper = document.createElement("div");
 		wrapper.classname = "currentmodulemeta";
 		wrapper.id = "currentmodulemeta";
+		wrapper.style.position = 'absolute'
+
+		wrapper.left = '100px';
+		wrapper.top = '10px';
+
 		this.savebutton = document.createElement("a");
 		this.savebutton.className = 'save-button glass';
 		this.savebutton.id = 'save-button';
 		this.savebutton.href = '#';
-		this.savebutton.onclick =  function() { self.saveFunction() };
+
+		this.savebutton.style.position = 'absolute'
+
+		this.savebutton.left = '100px';
+		this.savebutton.top = '10px';
+
+		if (this.savebutton.addEventListener) {
+			this.savebutton.addEventListener('click', function () {
+				self.saveFunction();
+			});
+		} else if (this.savebutton.attachEvent) {
+			this.savebutton.attachEvent('onclick', function () {
+				self.saveFunction();
+			});
+		}
 
 		wrapper.appendChild(this.savebutton);
 
