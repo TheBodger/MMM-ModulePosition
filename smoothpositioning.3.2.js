@@ -27,28 +27,6 @@ var minimum_size = 50;
 
 var theCanvas = document.getElementById("canvas");
 
-
-//testing variables
-
-var bounddiv = document.createElement("div");
-bounddiv.id = "bound";
-bounddiv.style.borderColor = "red";
-bounddiv.style.borderWidth = "1px";
-bounddiv.style.borderStyle = "solid";
-bounddiv.style.visibility = "hidden"
-bounddiv.style.position = "absolute"
-
-var xydiv = document.createElement("div");
-xydiv.id = "xy";
-xydiv.style.visibility = "hidden"
-xydiv.style.position = "absolute"
-xydiv.style.backgroundColor = "green"
-xydiv.style.width = "5px"
-xydiv.style.height = "5px"
-theCanvas.appendChild(bounddiv);
-theCanvas.appendChild(xydiv);
-
-
 var currentelement;
 
 var timers = {};
@@ -101,18 +79,10 @@ function getcurrentmeta(element) {
 
 function makedraggable(element) {
 
-	element.classList.add("dragme");
+	element.classList.add("drag");
 	element.addEventListener("mousedown", mouseDownListener, false);
 
 	setmeta(element, getcurrentmeta(element), getcurrentmeta(element), { x: 0, y: 0, w: 0, h: 0 });
-
-	window.addEventListener("mousemove",showposition, false);
-	
-}
-
-function showposition(event) {
-
-	console.log(event.pageX, event.pageY);
 
 }
 
