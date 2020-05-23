@@ -23,7 +23,8 @@ Module.register("MMM-ModulePosition", {
 		easeAmount : 0.30, // percentage of delta to step
 		FPS: 15 ,// frames per second
 		minimum_size: 50, //minimum size in px that the resizer will  go down to
-		canvasid:"body", //the overall parent for all movement constraints, any named DOM element, or if null a canvas is created from the visible window
+		canvasid: "body", //the overall parent for all movement constraints, any named DOM element, or if null a canvas is created from the visible window
+		useproxydiv:true, //encapsulate all the choosen divs contents in a proxy div that will be used for positioning/ overcomes the transitioning style used by MM2
 	},
 
 	start: function () {
@@ -37,18 +38,6 @@ Module.register("MMM-ModulePosition", {
 		this.sendNotificationToNodeHelper("STATUS", this.identifier);
 
 		this.moduletracking = {};
-
-		this.interval = 1000 / this.config.FPS; //how long each frame lasts for
-
-		//some working variables that are used during dragging/resizing
-
-		this.timers = {};
-		this.timer = null;;
-
-		this.dragging = false;
-		this.resizing = false;
-
-		var self = this;
 
 	},
 
@@ -127,13 +116,10 @@ Module.register("MMM-ModulePosition", {
 			self.moduletracking[module.identifier]['modpos'] = { modpos: { x: 0, y: 0, w: 0, h: 0 } };;
 		});
 
-		//TODO - support null canvasid = viewable window
-		if (this.config.canvasid.toLowerCase() == 'body') {
-			theCanvas = document.body;
-		}
-		else {
-			theCanvas = document.getElementById(this.config.canvasid);
-		}
+		//share the global variables from the config
+		//must be done before setting up the modules
+
+		smoothpositioninginit(this.config);
 
 		//now we search the completed dom module looking for all the divs we need to amend
 
@@ -143,33 +129,43 @@ Module.register("MMM-ModulePosition", {
 
 				var modulediv = document.getElementById(module);
 
+				if (self.config.useproxydiv) {
+					//get the actual divs details move to a proxy and then use the proxy instead for movement and tracking
+
+					//var proxydiv = document.createElement('div');
+		
+					//var cloned = modulediv.cloneNode(true);
+					//proxydiv.innerHTML = cloned.innerHTML;
+
+					//modulediv.innerHTML = '';
+					//modulediv.appendChild(proxydiv);
+
+					//modulediv = proxydiv;
+				}
+
 				makedraggable(modulediv);
 				makeresizable(modulediv);
 
 				//and we need to add a couple of events so we can track the mouse over the modules
 
-				modulediv.onmouseover = function () { self.showover() };
-				modulediv.onmouseout = function () { self.showout() };
+				modulediv.onmouseover = function () { self.showover(event) };
+				modulediv.onmouseout = function () { self.showout(event) };
 
 				//if we are cropping add the class to one with cropping on
 
 			}
 		}
 
-		//and finally we add the savebutton to the draggers
-
-		//makedraggable(document.getElementById('currentmodulemeta'));
-
 	},
 
-	showover: function () {
+	showover: function (event) {
 
-		this.savebutton.innerText = "Over";
+		this.savebutton.innerText = event.currentTarget.id;
 
 	},
 	showout: function () {
 
-		this.savebutton.innerText = "Out";
+		this.savebutton.innerText = "";
 
 	},
 
@@ -191,19 +187,14 @@ Module.register("MMM-ModulePosition", {
 		wrapper.classname = "currentmodulemeta";
 		wrapper.id = "currentmodulemeta";
 		wrapper.style.position = 'absolute'
-
-		wrapper.left = '100px';
-		wrapper.top = '10px';
+		wrapper.style.left = '100px';
+		wrapper.style.top = '100px';
 
 		this.savebutton = document.createElement("a");
 		this.savebutton.className = 'save-button glass';
 		this.savebutton.id = 'save-button';
 		this.savebutton.href = '#';
-
 		this.savebutton.style.position = 'absolute'
-
-		this.savebutton.left = '100px';
-		this.savebutton.top = '10px';
 
 		if (this.savebutton.addEventListener) {
 			this.savebutton.addEventListener('click', function () {
@@ -222,11 +213,18 @@ Module.register("MMM-ModulePosition", {
 
 	saveFunction: function() {
 
-		console.log("saving config");
-		console.log(document.getElementById('save-button').innerText);
-		console.log(this.moduletracking);
-		console.log(interactmodules);
+		//get all the modules current positions
 
+		for (var module in this.moduletracking){
+			if (!this.moduletracking[module].ignore) {
+				this.moduletracking[module].modpos = getmeta(document.getElementById(module)).current;
+				this.moduletracking[module]['state'] = getstate(document.getElementById(module));
+			};
+		}
+
+		//send them to the nodehelper to write out 
+
+		this.sendNotificationToNodeHelper("WRITE_THIS", { moduleinstance: this.identifier, payload: this.moduletracking });
 
 	//we want to save a revised config with the new modpos values
 	//as opposed to using CSS ?? 

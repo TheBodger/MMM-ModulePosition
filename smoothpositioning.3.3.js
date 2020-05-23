@@ -58,8 +58,8 @@ function smoothpositioninginit(smoothpositioningconfig) {
 
 }
 
-function setmeta(element, current, target, step) {
-	element.dataset.meta = JSON.stringify({ current: current, target: target, step: step });	
+function setmeta(element, original, current, target, step) {
+	element.dataset.meta = JSON.stringify({ original:original, current: current, target: target, step: step });	
 }
 
 function setstate(element, amended, active) {
@@ -71,10 +71,8 @@ function setmousemeta(element, mousemeta) {
 }
 
 function getmeta(element) {
-
 	return JSON.parse(element.dataset.meta);
-	//({ current: current, target: target, step: step });
-
+	//({ original:original, current: current, target: target, step: step });
 }
 
 function getstate(element) {
@@ -82,9 +80,7 @@ function getstate(element) {
 }
 
 function getmousemeta(element) {
-
 	return JSON.parse(element.dataset.mousemeta);
-
 }
 
 function getcurrentmeta(element) {
@@ -115,7 +111,7 @@ function makedraggable(element) {
 	element.classList.add("drag");
 	element.addEventListener("mousedown", mouseDownListener, false);
 
-	setmeta(element, getcurrentmeta(element), getcurrentmeta(element), { x: 0, y: 0, w: 0, h: 0 });
+	setmeta(element, getcurrentmeta(element), getcurrentmeta(element), getcurrentmeta(element), { x: 0, y: 0, w: 0, h: 0 });
 
 	//add a couple of tracking eleements
 
@@ -203,7 +199,7 @@ function makeresizable(element) {
 	divbl.addEventListener("mousedown", mouseDownListener, false);
 	divbr.addEventListener("mousedown", mouseDownListener, false);
 
-	setmeta(element, getcurrentmeta(element), getcurrentmeta(element), { x: 0, y: 0, w: 0, h: 0 });
+	setmeta(element, getcurrentmeta(element), getcurrentmeta(element), getcurrentmeta(element), { x: 0, y: 0, w: 0, h: 0 });
 
 }
 
@@ -288,7 +284,7 @@ function mouseDownListener(event) {
 		//before we do this we set the location so it doesn't jump around the screen
 		//and we get the latest values for w/h/x/y because they have changed since last we were here for this element
 
-		setmeta(parentelement,getcurrentmeta(parentelement), getcurrentmeta(parentelement), {x:0,y:0,w:0,h:0})
+		setmeta(parentelement, getmeta(parentelement).original, getcurrentmeta(parentelement), getcurrentmeta(parentelement), {x:0,y:0,w:0,h:0})
 		var currentmeta = getmeta(parentelement);
 
 		//move the element
@@ -329,7 +325,7 @@ function mouseDownListener(event) {
 
 		//adjust the element target to be same as location (it should be anyway)
 		currentmeta = getmeta((resizing) ? parentelement : element);
-		setmeta((resizing) ? parentelement :element, currentmeta.current, currentmeta.current, currentmeta.step);
+		setmeta((resizing) ? parentelement : element, getmeta((resizing) ? parentelement : element).original, currentmeta.current, currentmeta.current, currentmeta.step);
 
 		timer = setInterval(onTimerTick, 1000 / interval);
 		timers[timer]=timer;
@@ -432,7 +428,7 @@ function mouseMoveListener(event) {
 	//store the new target
 	{
 		currentmeta.target = getresizedelement(element, deltaX, deltaY);
-		setmeta(element.parentElement, currentmeta.current, currentmeta.target, currentmeta.step);
+		setmeta(element.parentElement, getmeta(element.parentElement,).original,currentmeta.current, currentmeta.target, currentmeta.step);
 	}
 	else {
 	//store the new mouse location
@@ -442,7 +438,7 @@ function mouseMoveListener(event) {
 		currentmeta.target.y = Math.round(currentmeta.target.y + deltaY);
 
 		//store the new target
-		setmeta(element, currentmeta.current, currentmeta.target, currentmeta.step);
+		setmeta(element, getmeta(element).original,currentmeta.current, currentmeta.target, currentmeta.step);
 	}
 }
 
@@ -559,7 +555,7 @@ function onTimerTick() {
 		}
 
 	//save the new location
-	setmeta(actionelement, currentmeta.current, currentmeta.target, currentmeta.step)
+	setmeta(actionelement, getmeta(actionelement).original,currentmeta.current, currentmeta.target, currentmeta.step)
 
 	//move the element
 	actionelement.style.top = Math.round(currentmeta.current.y - (currentmeta.current.h / 2)).toString() + 'px';

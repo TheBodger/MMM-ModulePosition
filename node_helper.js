@@ -10,6 +10,7 @@
 var NodeHelper = require("node_helper");
 
 var moment = require("moment");
+fs = require('fs');
 
 //pseudo structures for commonality across all modules
 //obtained from a helper file of modules
@@ -98,6 +99,50 @@ module.exports = NodeHelper.create({
 			case "WRITE_THIS":this.writethis(payload); break;
 			case "STATUS": this.showstatus(payload); break;
 		}
+	},
+
+	writethis: function (payload) {
+
+		//1) create a custom_css set of entries at the module and actual names levels if a duplicate
+		//using IDs not classes
+		//ignore all ignorable modules and any not active or amended
+
+		var modules = payload.payload;
+		var css = '';
+
+		for (var module in modules) {
+
+			var thismod = modules[module];
+
+			//may need to have them next to each other not a space, a space means any ? 
+
+			if (!thismod.ignore && thismod.state.active && thismod.state.amended) {
+
+				css = css + '.' + thismod.name +
+					((thismod.duplicate) ? '#' + module : '') + 
+					' {' +
+					'\n\tleft:' + thismod.modpos.x + "px;" +
+					'\n\ttop:' + thismod.modpos.y + "px;" +
+					'\n\twidth:' + thismod.modpos.w + "px;" +
+					'\n\theight:' + thismod.modpos.h + "px;" +
+					'\n}' + "\r\n"
+				
+            }
+        }
+
+		// dont check if there are no modpos ! just write it
+
+		//create a directory to store these - not under modpos or add the directory as a gitignore
+
+		alert("BANG");
+
+		var cssfilename = 'custom.css.' + new Date().getTime(); //simplest format though smelly
+
+		fs.writeFile(cssfilename, css, 'utf8', (err) => {
+			if(err) console.error(err);
+			console.log('The file has been saved!');
+		});
+
 	},
 
 	sendNotificationToMasterModule: function(stuff, stuff2){
