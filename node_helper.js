@@ -125,6 +125,7 @@ module.exports = NodeHelper.create({
 					'\n\ttop:' + thismod.modpos.y + "px;" +
 					'\n\twidth:' + thismod.modpos.w + "px;" +
 					'\n\theight:' + thismod.modpos.h + "px;" +
+					'\n\tposition:' + 'absolute' + ";" +
 					'\n}' + "\r\n"
 				
             }
@@ -134,7 +135,7 @@ module.exports = NodeHelper.create({
 
 		//create a directory to store these - not under modpos or add the directory as a gitignore
 
-		alert("BANG");
+		//alert("BANG");
 
 		var cssfilename = 'custom.css.' + new Date().getTime(); //simplest format though smelly
 

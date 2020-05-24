@@ -66,6 +66,14 @@ function setstate(element, amended, active) {
 	element.dataset.state = JSON.stringify({amended:amended, active:active});
 }
 
+function setcss(element, offsetX, offsetY) {
+	element.dataset.cssoffset = JSON.stringify({ offsetX: offsetX, offsetY: offsetY });
+}
+
+function getcss(element) {
+	return JSON.parse(element.dataset.cssoffset);
+}
+
 function setmousemeta(element, mousemeta) {
 	element.dataset.mousemeta = JSON.stringify({ mousemeta: mousemeta });
 }
@@ -93,6 +101,8 @@ function getcurrentmeta(element) {
 
 	var trueoffset = getmouseposition({ clientX: element.offsetLeft, clientY: element.offsetTop });
 
+	//alert(JSON.stringify(element.offsetLeft));
+
 	//get the style information 
 	var tempstyle = theCanvas.currentStyle || window.getComputedStyle(theCanvas);
 
@@ -111,14 +121,34 @@ function makedraggable(element) {
 	element.classList.add("drag");
 	element.addEventListener("mousedown", mouseDownListener, false);
 
+	//get the original location based on whatever the CSS is at the time of loading the element
+
 	setmeta(element, getcurrentmeta(element), getcurrentmeta(element), getcurrentmeta(element), { x: 0, y: 0, w: 0, h: 0 });
 
-	//add a couple of tracking eleements
+	//apply absolute, store the new location and reset to the original positioning
+	//this gives us any positioning deltas we need to apply to the CSS when we create the custom CSS
+
+	var originalposition = window.getComputedStyle(element).position;
+
+	element.style.position = 'absolute';
+	var absmeta = getcurrentmeta(element);
+	element.style.position = originalposition;
+
+	//calculate the offets
+
+	var offsetX = absmeta.x - getmeta(element).original.x;
+	var offsetY = absmeta.y - getmeta(element).original.y;
+
+	//and store them in the element
+
+	setcss(element, offsetX, offsetY);
+
+	//add a couple of tracking elements
 
 	setstate(element, false, false );
 
 	//add an observer to catch a change to the position (made by the main.js as part of hiding/showing modules, animating transitions)
-	//so we can overide and keep them visible at all times
+	//so we can override and keep them visible at all times
 
 	// Select the node that will be observed for mutations
 	const targetNode = element;
@@ -275,14 +305,17 @@ function mouseDownListener(event) {
 		event.currentTarget.removeEventListener("mousedown", mouseDownListener, false);
 
 		//determine who we are dealing with
+		//element is the mousedown, that may be a resizer, in which case we need the parent
 
 		var element = getelement(event.currentTarget);
 		var parentelement = getelement(event.currentTarget, true);
 
 		//pop the div to the top level so absolute actual works
 		//and make it absolute here so we have correct initial positioning
-		//before we do this we set the location so it doesn't jump around the screen
+		//before we do this we set the new location to the original location before we apply the positioning
+		//absolut positioning will overide vertain #CSS settings and the element may move when it is made absolute
 		//and we get the latest values for w/h/x/y because they have changed since last we were here for this element
+		//and depending on its contents the w/h may change
 
 		setmeta(parentelement, getmeta(parentelement).original, getcurrentmeta(parentelement), getcurrentmeta(parentelement), {x:0,y:0,w:0,h:0})
 		var currentmeta = getmeta(parentelement);

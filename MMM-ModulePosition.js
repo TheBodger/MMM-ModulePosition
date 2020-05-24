@@ -55,7 +55,7 @@ Module.register("MMM-ModulePosition", {
 	getScripts: function () {
 		return [
 			'moment.js',
-			'smoothpositioning.3.2.js'
+			'smoothpositioning.3.3.js'
 		]
 	},
 
@@ -113,7 +113,7 @@ Module.register("MMM-ModulePosition", {
 			self.moduletracking[module.identifier]['ignore'] = (module.name == self.name || module.data.position == null || module.data.position == 'fullscreen_above' || module.data.position == 'fullscreen_below');
 			self.moduletracking[module.identifier]['duplicate'] = self.isduplicatemodule(module.name);
 			self.moduletracking[module.identifier]['name'] = module.name; // add after check for duplicate
-			self.moduletracking[module.identifier]['modpos'] = { modpos: { x: 0, y: 0, w: 0, h: 0 } };;
+			self.moduletracking[module.identifier]['modpos'] = { x: 0, y: 0, w: 0, h: 0 };
 		});
 
 		//share the global variables from the config
@@ -217,7 +217,21 @@ Module.register("MMM-ModulePosition", {
 
 		for (var module in this.moduletracking){
 			if (!this.moduletracking[module].ignore) {
-				this.moduletracking[module].modpos = getmeta(document.getElementById(module)).current;
+				var modposcurrent = getmeta(document.getElementById(module)).current;
+				var modposoriginal = getmeta(document.getElementById(module)).original;
+
+				//calculate the new modpos taking into account the changes between the current and original
+				//as the original was taken at the point the module was relative to its parent and current is always relative to the body
+				//then the CSS modpos actually shows the delta beetween the two
+
+				var deltax = modposcurrent.x - modposoriginal.x;
+				var deltay = modposoriginal.y - modposcurrent.y;
+
+				this.moduletracking[module].modpos.x = deltax - (modposcurrent.w / 2);
+				this.moduletracking[module].modpos.y = deltay - (modposcurrent.h / 2);
+				this.moduletracking[module].modpos.w = modposcurrent.w;
+				this.moduletracking[module].modpos.h = modposcurrent.h;
+
 				this.moduletracking[module]['state'] = getstate(document.getElementById(module));
 			};
 		}

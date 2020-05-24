@@ -100,8 +100,8 @@ function getcurrentmeta(element) {
 	//get the style information 
 	var tempstyle = theCanvas.currentStyle || window.getComputedStyle(theCanvas);
 
-	temp.x = -parseFloat(tempstyle.marginLeft.replace('px', '')) + (element.getBoundingClientRect().left + element.getBoundingClientRect().width / 2);
-	temp.y = -parseFloat(tempstyle.marginTop.replace('px', '')) + (element.getBoundingClientRect().top + element.getBoundingClientRect().height / 2);
+	temp.x = -parseFloat(tempstyle.marginLeft.replace('px', '')) + (element.getBoundingClientRect().left + (element.getBoundingClientRect().width / 2));
+	temp.y = -parseFloat(tempstyle.marginTop.replace('px', '')) + (element.getBoundingClientRect().top + (element.getBoundingClientRect().height / 2));
 
 	temp.w = element.getBoundingClientRect().width;
 	temp.h = element.getBoundingClientRect().height;
