@@ -217,22 +217,26 @@ Module.register("MMM-ModulePosition", {
 
 		for (var module in this.moduletracking){
 			if (!this.moduletracking[module].ignore) {
-				var modposcurrent = getmeta(document.getElementById(module)).current;
-				var modposoriginal = getmeta(document.getElementById(module)).original;
+				var element = document.getElementById(module);
+				var modposcurrent = getmeta(element).current;
+				var modposoriginal = getmeta(element).original;
+				var modposcssoffset = getcss(element);
 
-				//calculate the new modpos taking into account the changes between the current and original
-				//as the original was taken at the point the module was relative to its parent and current is always relative to the body
-				//then the CSS modpos actually shows the delta beetween the two
+				//calculate the modpos that will work when we apply absolute positioning to the element in the custom.css
+				//delta is the difference between the initial location and the final location
+				//the offset is the difference between pre and post absolute positioning
+				//we apply the size to move the origin to the top left from the centre of the element
 
-				var deltax = modposcurrent.x - modposoriginal.x;
+				var deltax = modposoriginal.x - modposcurrent.x;
 				var deltay = modposoriginal.y - modposcurrent.y;
 
-				this.moduletracking[module].modpos.x = deltax - (modposcurrent.w / 2);
-				this.moduletracking[module].modpos.y = deltay - (modposcurrent.h / 2);
+				this.moduletracking[module].modpos.x = deltax - (modposcurrent.w / 2) - modposcssoffset.offsetX;
+				this.moduletracking[module].modpos.y = deltay - (modposcurrent.h / 2) - modposcssoffset.offsetY;
+
 				this.moduletracking[module].modpos.w = modposcurrent.w;
 				this.moduletracking[module].modpos.h = modposcurrent.h;
 
-				this.moduletracking[module]['state'] = getstate(document.getElementById(module));
+				this.moduletracking[module]['state'] = getstate(element);
 			};
 		}
 
