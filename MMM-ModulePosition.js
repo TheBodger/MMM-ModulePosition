@@ -158,7 +158,10 @@ Module.register("MMM-ModulePosition", {
 		var isit = false;
 		for (identifier in this.moduletracking) {
 			isit = (this.moduletracking[identifier].name == modulename);
-			if (isit) { return isit; }
+			if (isit) {
+				this.moduletracking[identifier].duplicate = true;  //set the one in moduletracking that si now a duplicate.
+				return isit;
+			}
 		}
 
 		return isit;
@@ -169,12 +172,12 @@ Module.register("MMM-ModulePosition", {
 
 		var self = this;
 
-		var wrapper = document.createElement("div");
-		wrapper.className = "currentmodulemeta";
-		wrapper.id = "currentmodulemeta";
-		wrapper.style.position = 'absolute'
-		wrapper.style.left = '100px';
-		wrapper.style.top = '100px';
+		this.wrapper = document.createElement("div");
+		this.wrapper.className = "currentmodulemeta";
+		this.wrapper.id = "currentmodulemeta";
+		this.wrapper.style.position = 'absolute'
+		this.wrapper.style.left = '100px';
+		this.wrapper.style.top = '100px';
 
 		//add the save button
 
@@ -219,8 +222,8 @@ Module.register("MMM-ModulePosition", {
 		this.modulemeta.appendChild(this.modulemetay);
 		this.modulemeta.appendChild(this.modulemetah);
 
-		wrapper.appendChild(this.savebutton);
-		wrapper.appendChild(this.modulemeta);
+		this.wrapper.appendChild(this.savebutton);
+		this.wrapper.appendChild(this.modulemeta);
 		
 		if (this.savebutton.addEventListener) {
 			this.savebutton.addEventListener('click', function () {
@@ -232,9 +235,7 @@ Module.register("MMM-ModulePosition", {
 			});
 		}
 
-		wrapper.appendChild(this.modulemeta);
-
-		return wrapper;
+		return this.wrapper;
 	},
 
 	saveFunction: function() {
