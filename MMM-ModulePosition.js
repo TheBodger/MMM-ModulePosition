@@ -145,7 +145,7 @@ Module.register("MMM-ModulePosition", {
 
 	showover: function (event) {
 
-		setgrid(event.currentTarget.id, getmeta(currentelement).current);
+		setgrid(event.currentTarget.id, getmeta(event.currentTarget).current);
 	},
 
 	showout: function () {
@@ -178,16 +178,15 @@ Module.register("MMM-ModulePosition", {
 
 		//add the save button
 
-		var savebutton = document.createElement("button");
-		savebutton.className = 'save-button glass';
-		savebutton.id = 'save-button';
-		savebutton.innerHTML = "Save Positions";
+		this.savebutton = document.createElement("button");
+		this.savebutton.className = 'save-button glass';
+		this.savebutton.id = 'save-button';
+		this.savebutton.innerHTML = "Save Positions";
 
 		//add the current item meta display
 
 		this.modulemeta = document.createElement('div');
 		this.modulemeta.className = "metagrid";
-		this.modulemeta.style.left = parseInt(this.savebutton.style.left) + parseInt(this.savebutton.style.left);
 
 		this.modulemetaname = document.createElement('div');
 		this.modulemetaname.className = "metagridname";
@@ -220,7 +219,7 @@ Module.register("MMM-ModulePosition", {
 		this.modulemeta.appendChild(this.modulemetay);
 		this.modulemeta.appendChild(this.modulemetah);
 
-		wrapper.appendChild(savebutton);
+		wrapper.appendChild(this.savebutton);
 		wrapper.appendChild(this.modulemeta);
 		
 		if (this.savebutton.addEventListener) {

@@ -119,13 +119,13 @@ function setgrid(name, meta) {
 	t = document.getElementById('metagridname')
 	t.innerHTML = name;
 	t = document.getElementById('metagridx')
-	t.innerHTML = 'X: ' + meta.x;
+	t.innerHTML = 'X: ' + meta.x.toFixed(2);
 	t = document.getElementById('metagridy')
-	t.innerHTML = 'Y: ' + meta.y;
+	t.innerHTML = 'Y: ' + meta.y.toFixed(2);
 	t = document.getElementById('metagridw')
-	t.innerHTML = 'W: ' + meta.w;
+	t.innerHTML = 'W: ' + meta.w.toFixed(2);
 	t = document.getElementById('metagridh')
-	t.innerHTML = 'H: ' + meta.h;
+	t.innerHTML = 'H: ' + meta.h.toFixed(2);
 }
 
 function makedraggable(element) {
@@ -418,7 +418,7 @@ function mouseMoveListener(event) {
 	//because we are moving we stick with the current element and dont try to determine who we are moving over
 	//otherwise the mouseover finds another valid element
 
-	var element = currentelement; //was getelement(event.target);
+	var element = currentelement; 
 
 	//as the element has been moved, we assume it has been amended
 	//resizing works differently to dragging so we have to split the parts of the code - really !
@@ -496,7 +496,8 @@ function mouseMoveListener(event) {
 	//store the new target
 	{
 		currentmeta.target = getresizedelement(element, deltaX, deltaY);
-		setmeta(element.parentElement, getmeta(element.parentElement,).original,currentmeta.current, currentmeta.target, currentmeta.step);
+		setmeta(element.parentElement, getmeta(element.parentElement).original, currentmeta.current, currentmeta.target, currentmeta.step);
+		setgrid(element.parentElement.id, getmeta(element.parentElement).current);
 	}
 	else {
 	//store the new mouse location
@@ -506,8 +507,11 @@ function mouseMoveListener(event) {
 		currentmeta.target.y = Math.round(currentmeta.target.y + deltaY);
 
 		//store the new target
-		setmeta(element, getmeta(element).original,currentmeta.current, currentmeta.target, currentmeta.step);
+		setmeta(element, getmeta(element).original, currentmeta.current, currentmeta.target, currentmeta.step);
+		setgrid(element.id, getmeta(element).current);
 	}
+
+
 }
 
 function getresizedelement(element, deltaX, deltaY,roundvalues=false) {
