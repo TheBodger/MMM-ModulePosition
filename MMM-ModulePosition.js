@@ -159,7 +159,7 @@ Module.register("MMM-ModulePosition", {
 		for (identifier in this.moduletracking) {
 			isit = (this.moduletracking[identifier].name == modulename);
 			if (isit) {
-				this.moduletracking[identifier].duplicate = true;  //set the one in moduletracking that si now a duplicate.
+				this.moduletracking[identifier].duplicate = true;  //set the one in moduletracking that is now a duplicate.
 				return isit;
 			}
 		}

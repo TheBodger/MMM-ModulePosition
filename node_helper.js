@@ -125,7 +125,7 @@ module.exports = NodeHelper.create({
 					'\n\ttop:' + thismod.modpos.y + "px;" +
 					'\n\twidth:' + thismod.modpos.w + "px;" +
 					'\n\theight:' + thismod.modpos.h + "px;" +
-					'\n\tposition:' + 'absolute' + ";" +
+					'\n\tposition:' + 'absolute' + " !important; /*included to overide the transition static positioning that is added inline */" +
 					'\n}' + "\r\n"
 				
             }
