@@ -24,7 +24,6 @@ Module.register("MMM-ModulePosition", {
 		FPS: 15 ,// frames per second
 		minimum_size: 50, //minimum size in px that the resizer will  go down to
 		canvasid: "body", //the overall parent for all movement constraints, any named DOM element, or if null a canvas is created from the visible window
-		useproxydiv:true, //encapsulate all the choosen divs contents in a proxy div that will be used for positioning/ overcomes the transitioning style used by MM2
 	},
 
 	start: function () {
@@ -129,20 +128,6 @@ Module.register("MMM-ModulePosition", {
 
 				var modulediv = document.getElementById(module);
 
-				if (self.config.useproxydiv) {
-					//get the actual divs details move to a proxy and then use the proxy instead for movement and tracking
-
-					//var proxydiv = document.createElement('div');
-		
-					//var cloned = modulediv.cloneNode(true);
-					//proxydiv.innerHTML = cloned.innerHTML;
-
-					//modulediv.innerHTML = '';
-					//modulediv.appendChild(proxydiv);
-
-					//modulediv = proxydiv;
-				}
-
 				makedraggable(modulediv);
 				makeresizable(modulediv);
 
@@ -160,12 +145,12 @@ Module.register("MMM-ModulePosition", {
 
 	showover: function (event) {
 
-		this.savebutton.innerText = event.currentTarget.id;
-
+		setgrid(event.currentTarget.id, getmeta(currentelement).current);
 	},
+
 	showout: function () {
 
-		this.savebutton.innerText = "";
+		setgrid('No Selected Module', { x: 0, y: 0, w: 0, h: 0 });
 
 	},
 
@@ -183,6 +168,7 @@ Module.register("MMM-ModulePosition", {
 	getDom: function () {
 
 		var self = this;
+
 		var wrapper = document.createElement("div");
 		wrapper.classname = "currentmodulemeta";
 		wrapper.id = "currentmodulemeta";
@@ -190,12 +176,53 @@ Module.register("MMM-ModulePosition", {
 		wrapper.style.left = '100px';
 		wrapper.style.top = '100px';
 
-		this.savebutton = document.createElement("a");
-		this.savebutton.className = 'save-button glass';
-		this.savebutton.id = 'save-button';
-		this.savebutton.href = '#';
-		this.savebutton.style.position = 'absolute'
+		//add the save button
 
+		var savebutton = document.createElement("button");
+		savebutton.className = 'save-button glass';
+		savebutton.id = 'save-button';
+		savebutton.innerHTML = "Save Positions";
+
+		//add the current item meta display
+
+		this.modulemeta = document.createElement('div');
+		this.modulemeta.className = "metagrid";
+		this.modulemeta.style.left = parseInt(this.savebutton.style.left) + parseInt(this.savebutton.style.left);
+
+		this.modulemetaname = document.createElement('div');
+		this.modulemetaname.className = "metagridname";
+		this.modulemetaname.id = "metagridname";
+		this.modulemetaname.innerHTML = "Module Name";
+
+		this.modulemetax = document.createElement('div');
+		this.modulemetax.className = "metagridx";
+		this.modulemetax.id = "metagridx";
+		this.modulemetax.innerHTML = "X:";
+
+		this.modulemetay = document.createElement('div');
+		this.modulemetay.className = "metagridy";
+		this.modulemetay.id = "metagridy";
+		this.modulemetay.innerHTML = "Y:";
+
+		this.modulemetaw = document.createElement('div');
+		this.modulemetaw.className = "metagridw";
+		this.modulemetaw.id = "metagridw";
+		this.modulemetaw.innerHTML = "W:";
+
+		this.modulemetah = document.createElement('div');
+		this.modulemetah.className = "metagridh";
+		this.modulemetah.id = "metagridh";
+		this.modulemetah.innerHTML = "H:";
+
+		this.modulemeta.appendChild(this.modulemetaname);
+		this.modulemeta.appendChild(this.modulemetax);
+		this.modulemeta.appendChild(this.modulemetaw);
+		this.modulemeta.appendChild(this.modulemetay);
+		this.modulemeta.appendChild(this.modulemetah);
+
+		wrapper.appendChild(savebutton);
+		wrapper.appendChild(this.modulemeta);
+		
 		if (this.savebutton.addEventListener) {
 			this.savebutton.addEventListener('click', function () {
 				self.saveFunction();
@@ -206,7 +233,7 @@ Module.register("MMM-ModulePosition", {
 			});
 		}
 
-		wrapper.appendChild(this.savebutton);
+		wrapper.appendChild(this.modulemeta);
 
 		return wrapper;
 	},

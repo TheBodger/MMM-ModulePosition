@@ -114,6 +114,20 @@ function getcurrentmeta(element) {
 
 }
 
+function setgrid(name, meta) {
+	var t;
+	t = document.getElementById('metagridname')
+	t.innerHTML = name;
+	t = document.getElementById('metagridx')
+	t.innerHTML = 'X: ' + meta.x;
+	t = document.getElementById('metagridy')
+	t.innerHTML = 'Y: ' + meta.y;
+	t = document.getElementById('metagridw')
+	t.innerHTML = 'W: ' + meta.w;
+	t = document.getElementById('metagridh')
+	t.innerHTML = 'H: ' + meta.h;
+}
+
 function makedraggable(element) {
 
 	element.classList.add("drag");
@@ -185,8 +199,8 @@ function makedraggable(element) {
 				if (state.active || state.absolute) {
 					var oldvalue = getstyleasjson(mutation.oldValue);
 					if (oldvalue != null) {
-						console.log('The ' + mutation.attributeName + ' attribute of element ' + mutation.target.id + ' was modified. Old value was ' + oldvalue.position);
-						console.log('The new position is ' + mutation.target.style.position);
+						//console.log('The ' + mutation.attributeName + ' attribute of element ' + mutation.target.id + ' was modified. Old value was ' + oldvalue.position);
+						//console.log('The new position is ' + mutation.target.style.position);
 						if (mutation.target.style.postion != 'absolute') {
 							mutation.target.style.position = 'absolute'
 						};

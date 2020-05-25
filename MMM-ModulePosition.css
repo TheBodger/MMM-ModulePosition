@@ -114,3 +114,44 @@
 .glass:hover {
     background: linear-gradient(orange,white);
 }
+
+/* the meta grid*/
+
+.metagridname {
+    grid-area: name;
+}
+
+.metagridx {
+    grid-area: x;
+}
+
+.metagridw {
+    grid-area: w;
+}
+
+.metagridy {
+    grid-area: y;
+}
+
+.metagridh {
+    grid-area: h;
+}
+
+.metagrid {
+    display: grid;
+    grid-template-areas: 'name name' 'x w' 'y h';
+    grid-gap: 1px;
+    background-color: rgba(255,255,255,0.25);
+    padding: 2px;
+    left: 110px;
+    top: 0;
+    width: 180px;
+    position: absolute;
+}
+
+    .metagrid > div {
+        color: white;
+        font-size: 14px;
+        padding: 4px;
+        background-color: rgba(255,255,255,0.35);
+    }
