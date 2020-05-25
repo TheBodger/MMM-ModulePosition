@@ -3,8 +3,6 @@
 //calculate the offset of the current element/module from its parent(or we need to find a parent positioned element)
 //use this offset to amend the final location so that we adjust back from being relative to body to being relative to its real parent
 
-alert("BANG");
-
 // JavaScript source code
 
 //each element carries 3 sets of information:
@@ -62,8 +60,8 @@ function setmeta(element, original, current, target, step) {
 	element.dataset.meta = JSON.stringify({ original:original, current: current, target: target, step: step });	
 }
 
-function setstate(element, amended, active) {
-	element.dataset.state = JSON.stringify({amended:amended, active:active});
+function setstate(element, amended, active, absolute) {
+	element.dataset.state = JSON.stringify({ amended: amended, active: active, absolute: absolute});
 }
 
 function setcss(element, offsetX, offsetY) {
@@ -122,30 +120,49 @@ function makedraggable(element) {
 	element.addEventListener("mousedown", mouseDownListener, false);
 
 	//get the original location based on whatever the CSS is at the time of loading the element
+	var origmeta = getcurrentmeta(element);
 
-	setmeta(element, getcurrentmeta(element), getcurrentmeta(element), getcurrentmeta(element), { x: 0, y: 0, w: 0, h: 0 });
+	var origLeft = (origmeta.x - (origmeta.w / 2));
+	var origTop = (origmeta.y - (origmeta.h / 2));
+
+	setmeta(element, origmeta, origmeta, origmeta, { x: 0, y: 0, w: 0, h: 0 });
+
+	console.log("ox", origmeta.x, origmeta.w);
+	console.log("oy", origmeta.y, origmeta.h);
 
 	//apply absolute, store the new location and reset to the original positioning
 	//this gives us any positioning deltas we need to apply to the CSS when we create the custom CSS
 
-	var originalposition = window.getComputedStyle(element).position;
+	//need to only handle inline styles !!
+	//so we access the element.style AND NOT THE computed style
+	//this shows style entries that are actually inline and ignores those from stylesheets
+
+	var originalposition = element.style.position;
 
 	element.style.position = 'absolute';
+
 	var absmeta = getcurrentmeta(element);
-	element.style.position = originalposition;
 
-	//calculate the offets
+	if (originalposition == '') {
+		element.style.removeProperty('position');
+	}
+	else {
+		element.style.position = originalposition;
+	}
 
-	var offsetX = absmeta.x - getmeta(element).original.x;
-	var offsetY = absmeta.y - getmeta(element).original.y;
+	var absdeltaLeft = (absmeta.x - (absmeta.w / 2)) - origLeft;
+	var absdeltaTop = (absmeta.y - (absmeta.h / 2)) - origTop;
+
+	var offsetX = element.offsetLeft - origLeft -  absdeltaLeft;
+	var offsetY = element.offsetTop - origTop - absdeltaTop;
 
 	//and store them in the element
 
 	setcss(element, offsetX, offsetY);
 
-	//add a couple of tracking elements
+	//add a couple of tracking elements and check if this is absolute positioned at any specificity
 
-	setstate(element, false, false );
+	setstate(element, false, false, (window.getComputedStyle(element, null).position == 'absolute'));
 
 	//add an observer to catch a change to the position (made by the main.js as part of hiding/showing modules, animating transitions)
 	//so we can override and keep them visible at all times
@@ -163,12 +180,16 @@ function makedraggable(element) {
 		for (let mutation of mutationsList) {
 			if (mutation.target.dataset != null) {
 				var state = getstate(mutation.target);
-				if (state.active) {
+				// start this as soon as we have loaded as we need to show the module in the location we want and not have 
+				// the static position override the absolute if we need it
+				if (state.active || state.absolute) {
 					var oldvalue = getstyleasjson(mutation.oldValue);
 					if (oldvalue != null) {
 						console.log('The ' + mutation.attributeName + ' attribute of element ' + mutation.target.id + ' was modified. Old value was ' + oldvalue.position);
 						console.log('The new position is ' + mutation.target.style.position);
-						if (mutation.target.style.postion != 'absolute') { mutation.target.style.position = 'absolute' };
+						if (mutation.target.style.postion != 'absolute') {
+							mutation.target.style.position = 'absolute'
+						};
 					}
                 }
             }
@@ -329,7 +350,7 @@ function mouseDownListener(event) {
 
 		parentelement.style.position = 'absolute';
 
-		setstate(parentelement, getstate(parentelement).amended, true); //set active to true
+		setstate(parentelement, getstate(parentelement).amended, true, getstate(parentelement).absolute,); //set active to true
 		
 		document.body.append(parentelement);
 
@@ -390,11 +411,11 @@ function mouseMoveListener(event) {
 
 	if (resizing) {
 		var currentmeta = getmeta(element.parentElement);
-		setstate(element, true, getstate(element.parentElement).active); //set amended true
+		setstate(element, true, getstate(element.parentElement).active, getstate(element.parentElement).absolute); //set amended true
 	}
 	else {
 		var currentmeta = getmeta(element);
-		setstate(element, true, getstate(element).active); //set amended true
+		setstate(element, true, getstate(element).active, getstate(element).absolute); //set amended true
 	}
 
 	var checkmeta = { target: currentmeta.target };

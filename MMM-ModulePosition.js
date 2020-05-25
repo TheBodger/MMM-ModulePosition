@@ -223,15 +223,15 @@ Module.register("MMM-ModulePosition", {
 				var modposcssoffset = getcss(element);
 
 				//calculate the modpos that will work when we apply absolute positioning to the element in the custom.css
+				//all calcs are at the top left and not middle
 				//delta is the difference between the initial location and the final location
 				//the offset is the difference between pre and post absolute positioning
-				//we apply the size to move the origin to the top left from the centre of the element
 
-				var deltax = modposoriginal.x - modposcurrent.x;
-				var deltay = modposoriginal.y - modposcurrent.y;
+				//var deltax = modposoriginal.x -  modposcurrent.x  ;
+				//var deltay = modposoriginal.y -  modposcurrent.y  ;
 
-				this.moduletracking[module].modpos.x = deltax - (modposcurrent.w / 2) - modposcssoffset.offsetX;
-				this.moduletracking[module].modpos.y = deltay - (modposcurrent.h / 2) - modposcssoffset.offsetY;
+				this.moduletracking[module].modpos.x = (modposcurrent.x - (modposcurrent.w / 2)) + modposcssoffset.offsetX;
+				this.moduletracking[module].modpos.y = (modposcurrent.y - (modposcurrent.h / 2)) + modposcssoffset.offsetY;
 
 				this.moduletracking[module].modpos.w = modposcurrent.w;
 				this.moduletracking[module].modpos.h = modposcurrent.h;
