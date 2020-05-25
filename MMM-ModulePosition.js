@@ -170,7 +170,7 @@ Module.register("MMM-ModulePosition", {
 		var self = this;
 
 		var wrapper = document.createElement("div");
-		wrapper.classname = "currentmodulemeta";
+		wrapper.className = "currentmodulemeta";
 		wrapper.id = "currentmodulemeta";
 		wrapper.style.position = 'absolute'
 		wrapper.style.left = '100px';
