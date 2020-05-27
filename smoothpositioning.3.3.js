@@ -1,3 +1,4 @@
+// JavaScript source code
 
 //create 3.3. 
 //calculate the offset of the current element/module from its parent(or we need to find a parent positioned element)
@@ -52,16 +53,16 @@ function smoothpositioninginit(smoothpositioningconfig) {
 	easeAmount = smoothpositioningconfig.easeAmount;
 	FPS = smoothpositioningconfig.FPS;
 	interval = 1000 / FPS;
-	minimum_size = smoothpositioningconfig.minimum_size ;
+	minimum_size = smoothpositioningconfig.minimum_size;
 
 }
 
 function setmeta(element, original, current, target, step) {
-	element.dataset.meta = JSON.stringify({ original:original, current: current, target: target, step: step });	
+	element.dataset.meta = JSON.stringify({ original: original, current: current, target: target, step: step });
 }
 
 function setstate(element, amended, active, absolute) {
-	element.dataset.state = JSON.stringify({ amended: amended, active: active, absolute: absolute});
+	element.dataset.state = JSON.stringify({ amended: amended, active: active, absolute: absolute });
 }
 
 function setcss(element, offsetX, offsetY) {
@@ -110,7 +111,7 @@ function getcurrentmeta(element) {
 	temp.w = element.getBoundingClientRect().width;
 	temp.h = element.getBoundingClientRect().height;
 
-	return  temp;
+	return temp;
 
 }
 
@@ -167,7 +168,7 @@ function makedraggable(element) {
 	var absdeltaLeft = (absmeta.x - (absmeta.w / 2)) - origLeft;
 	var absdeltaTop = (absmeta.y - (absmeta.h / 2)) - origTop;
 
-	var offsetX = element.offsetLeft - origLeft -  absdeltaLeft;
+	var offsetX = element.offsetLeft - origLeft - absdeltaLeft;
 	var offsetY = element.offsetTop - origTop - absdeltaTop;
 
 	//and store them in the element
@@ -185,7 +186,7 @@ function makedraggable(element) {
 	const targetNode = element;
 
 	// Options for the observer (which mutations to observe)
-	const config = { attributes: true, attributeFilter: ["style"], attributeOldValue: true,};
+	const config = { attributes: true, attributeFilter: ["style"], attributeOldValue: true, };
 
 	// Callback function to execute when mutations are observed
 	// only actually fire once the target element is active
@@ -205,8 +206,8 @@ function makedraggable(element) {
 							mutation.target.style.position = 'absolute'
 						};
 					}
-                }
-            }
+				}
+			}
 		}
 	};
 
@@ -269,7 +270,7 @@ function makeresizable(element) {
 }
 
 //get the actual element not the resizer
-function getelement(element,getparent=false) {
+function getelement(element, getparent = false) {
 
 	if (element.classList == null) { //must be over the body or elsewhere if this fires
 		return currentelement;
@@ -285,7 +286,7 @@ function getelement(element,getparent=false) {
 		}
 		else {
 			return element;
-        }
+		}
 	}
 
 	//must be over the body or elsewhere
@@ -304,7 +305,7 @@ function getmouseposition(mouseevent) {
 
 	//getting mouse position correctly 
 	var bRect = theCanvas.getBoundingClientRect();
-	mouseX = (mouseevent.clientX - bRect.left) * (((theCanvas.clientWidth == 0) ? defaultwidth : theCanvas.clientWidth)  / ((bRect.width == 0) ? defaultwidth : bRect.width) );
+	mouseX = (mouseevent.clientX - bRect.left) * (((theCanvas.clientWidth == 0) ? defaultwidth : theCanvas.clientWidth) / ((bRect.width == 0) ? defaultwidth : bRect.width));
 	mouseY = (mouseevent.clientY - bRect.top) * (((theCanvas.clientHeight == 0) ? defaultheight : theCanvas.clientHeight) / ((bRect.height == 0) ? defaultheight : bRect.height));
 
 	return { mouseX: mouseX, mouseY: mouseY };
@@ -352,7 +353,7 @@ function mouseDownListener(event) {
 		//and we get the latest values for w/h/x/y because they have changed since last we were here for this element
 		//and depending on its contents the w/h may change
 
-		setmeta(parentelement, getmeta(parentelement).original, getcurrentmeta(parentelement), getcurrentmeta(parentelement), {x:0,y:0,w:0,h:0})
+		setmeta(parentelement, getmeta(parentelement).original, getcurrentmeta(parentelement), getcurrentmeta(parentelement), { x: 0, y: 0, w: 0, h: 0 })
 		var currentmeta = getmeta(parentelement);
 
 		//move the element
@@ -364,8 +365,8 @@ function mouseDownListener(event) {
 
 		parentelement.style.position = 'absolute';
 
-		setstate(parentelement, getstate(parentelement).amended, true, getstate(parentelement).absolute,); //set active to true
-		
+		setstate(parentelement, getstate(parentelement).amended, true, getstate(parentelement).absolute); //set active to true
+
 		document.body.append(parentelement);
 
 		//tell the mutation observer for this element to start observing.
@@ -376,7 +377,7 @@ function mouseDownListener(event) {
 
 		if (element != parentelement) {
 			resizing = true;
-        }
+		}
 
 		if (!resizing) {
 			document.body.style.cursor = "move";
@@ -396,7 +397,7 @@ function mouseDownListener(event) {
 		setmeta((resizing) ? parentelement : element, getmeta((resizing) ? parentelement : element).original, currentmeta.current, currentmeta.current, currentmeta.step);
 
 		timer = setInterval(onTimerTick, 1000 / interval);
-		timers[timer]=timer;
+		timers[timer] = timer;
 
 		//code below prevents the mouse down from having an effect on the main browser window:
 		if (event.preventDefault) {
@@ -418,7 +419,7 @@ function mouseMoveListener(event) {
 	//because we are moving we stick with the current element and dont try to determine who we are moving over
 	//otherwise the mouseover finds another valid element
 
-	var element = currentelement; 
+	var element = currentelement;
 
 	//as the element has been moved, we assume it has been amended
 	//resizing works differently to dragging so we have to split the parts of the code - really !
@@ -478,7 +479,7 @@ function mouseMoveListener(event) {
 		var checkmaxY = Math.round(maxY - (checkmeta.target.y + deltaY));
 		var checkminX = Math.round(minX - (checkmeta.target.x + deltaX));
 		var checkminY = Math.round(minY - (checkmeta.target.y + deltaY));
-    }
+	}
 
 	//adjust the new mouse position to take into account any out of bounds amounts
 	//if any neg max values or pos min values
@@ -500,7 +501,7 @@ function mouseMoveListener(event) {
 		setgrid(element.parentElement.id, getmeta(element.parentElement).current);
 	}
 	else {
-	//store the new mouse location
+		//store the new mouse location
 		//the target is the current target + the calculated delta, 
 		//as the currentX represents some position between originalx and the target, we add the delta to the target
 		currentmeta.target.x = Math.round(currentmeta.target.x + deltaX);
@@ -514,7 +515,7 @@ function mouseMoveListener(event) {
 
 }
 
-function getresizedelement(element, deltaX, deltaY,roundvalues=false) {
+function getresizedelement(element, deltaX, deltaY, roundvalues = false) {
 
 	var currentmeta = getmeta(element.parentElement);
 	var tempmeta = currentmeta.target;
@@ -565,11 +566,11 @@ function getresizedelement(element, deltaX, deltaY,roundvalues=false) {
 		const height = currentmeta.target.h - deltaY;
 		if (width > minimum_size) {
 			tempmeta.w = width;
-			tempmeta.x = currentmeta.target.x + (deltaX/2);
+			tempmeta.x = currentmeta.target.x + (deltaX / 2);
 		}
 		if (height > minimum_size) {
 			tempmeta.h = height;
-			tempmeta.y = currentmeta.target.y + (deltaY/2);
+			tempmeta.y = currentmeta.target.y + (deltaY / 2);
 		}
 	}
 
@@ -578,13 +579,13 @@ function getresizedelement(element, deltaX, deltaY,roundvalues=false) {
 		tempmeta.h = Math.round(tempmeta.h);
 		tempmeta.x = Math.round(tempmeta.x);
 		tempmeta.y = Math.round(tempmeta.y);
-    }
+	}
 
 	return tempmeta;
 
 }
 
-function onTimerTick() {  
+function onTimerTick() {
 
 	//get the correct element to action
 
@@ -608,26 +609,25 @@ function onTimerTick() {
 	if (
 		(!dragging) &&
 		(Math.abs(currentmeta.current.x - currentmeta.target.x) < 0.1) &&
-		(Math.abs(currentmeta.current.y - currentmeta.target.y) < 0.1) 
+		(Math.abs(currentmeta.current.y - currentmeta.target.y) < 0.1)
 		&&
 		(Math.abs(currentmeta.current.w - currentmeta.target.w) < 0.1) &&
-		(Math.abs(currentmeta.current.h - currentmeta.target.h) < 0.1) 
-		)
-		{
-			currentmeta.current.x = currentmeta.target.x;
-			currentmeta.current.y = currentmeta.target.y;
-			currentmeta.current.w = currentmeta.target.w;
-			currentmeta.current.h = currentmeta.target.h;
-			
-			//stop timer:
+		(Math.abs(currentmeta.current.h - currentmeta.target.h) < 0.1)
+	) {
+		currentmeta.current.x = currentmeta.target.x;
+		currentmeta.current.y = currentmeta.target.y;
+		currentmeta.current.w = currentmeta.target.w;
+		currentmeta.current.h = currentmeta.target.h;
 
-			delete timers[timer];
+		//stop timer:
 
-			clearInterval(timer);
-		}
+		delete timers[timer];
+
+		clearInterval(timer);
+	}
 
 	//save the new location
-	setmeta(actionelement, getmeta(actionelement).original,currentmeta.current, currentmeta.target, currentmeta.step)
+	setmeta(actionelement, getmeta(actionelement).original, currentmeta.current, currentmeta.target, currentmeta.step)
 
 	//move the element
 	actionelement.style.top = Math.round(currentmeta.current.y - (currentmeta.current.h / 2)).toString() + 'px';
@@ -643,7 +643,7 @@ function mouseUpListener(event) {
 	//because we were moving we stick with the current element and dont try to determine who we are moving over
 	//otherwise the mouseover finds another valid dragme and attachs the mouse down to the wrong element
 	var element = currentelement; //getelement(event.target);
-	
+
 	element.addEventListener("mousedown", mouseDownListener, false);
 	window.removeEventListener("mouseup", mouseUpListener, false);
 	if (dragging) {
