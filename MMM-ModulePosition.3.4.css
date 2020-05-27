@@ -1,0 +1,219 @@
+﻿html {
+    cursor:auto;
+}
+.resizable {
+    background: white;
+    box-sizing: border-box;
+}
+
+.resizable .resizers {
+    width: 100%;
+    height: 100%;
+    border: 3px solid #4286f4;
+    box-sizing: border-box;
+}
+
+.resizable .resizer {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%; /*magic to turn square into circle*/
+    background: white;
+    border: 3px solid #4286f4;
+    position:absolute;
+}
+
+.resizable .resizer.top-left {
+    left: -5px;
+    top: -5px;
+    cursor: nwse-resize; /*resizer cursor*/
+}
+
+.resizable .resizer.top-right {
+    right: -5px;
+    top: -5px;
+    cursor: nesw-resize;
+}
+
+.resizable .resizer.bottom-left {
+    left: -5px;
+    bottom: -5px;
+    cursor: nesw-resize;
+}
+
+.resizable .resizer.bottom-right {
+    right: -5px;
+    bottom: -5px;
+    cursor: nwse-resize;
+}
+
+.drag {
+    background-color: rgba(255,255,255,.25);
+    color: white;
+    font-size: 12px;
+    font-family: sans-serif;
+    border-radius: 8px;
+    padding: 20px;
+    touch-action: none;
+    /*width: 120px;*/
+    /* This makes things *much* easier */
+    box-sizing: border-box;
+    border-color: rgba(255,255,255,.5);
+    border-width: 4px;
+    border-style: groove;
+}
+
+.drag:hover {
+    border-color: white;
+    border-width: 4px;
+    border-style: groove;
+}
+.currentmodulemeta{
+    position:absolute;
+    background-color:rgba(0,0,0,0);
+    height:12pt;
+    width:100%;
+    top:1px;
+    left:0px;
+    z-index:1000;
+}
+/*
+    div {
+    border-color: white;
+    border-width: 1px;
+    border-style:solid;
+}
+    */
+
+.glass {
+    /* background styles */
+    position: relative;
+    display: inline-block;
+    padding: 15px 25px;
+    background-color: lightgray; /*for compatibility with older browsers*/
+    background-image: linear-gradient(lightgray,white);
+    /* text styles */
+    text-decoration: none;
+    color: #123;
+    font-size: 12px;
+    font-family: sans-serif;
+    font-weight: 100;
+    border-radius: 3px;
+    box-shadow: 0px 1px 4px -2px #333;
+    text-shadow: 0px -1px #333;
+}
+
+.glass:after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: calc(100% - 4px);
+    height: 50%;
+    background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+}
+
+.glass:hover {
+    background: linear-gradient(grey,white);
+}
+
+/* the meta grid*/
+
+.metagridname {
+    grid-area: name;
+}
+
+.metagridx {
+    grid-area: x;
+}
+
+.metagridw {
+    grid-area: w;
+}
+
+.metagridy {
+    grid-area: y;
+}
+
+.metagridh {
+    grid-area: h;
+}
+
+.metagrid {
+    display: grid;
+    grid-template-areas: 'name name' 'x w' 'y h';
+    grid-gap: 1px;
+    background-color: rgba(255,255,255,0.25);
+    padding: 2px;
+    left: 110px;
+    top: 0;
+    width: 180px;
+    position: absolute;
+}
+
+    .metagrid > div {
+        color: white;
+        font-size: 14px;
+        padding: 4px;
+        background-color: rgba(255,255,255,0.35);
+    }
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+    /* hide the actual switch */
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+

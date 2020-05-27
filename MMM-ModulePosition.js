@@ -24,6 +24,7 @@ Module.register("MMM-ModulePosition", {
 		FPS: 15 ,// frames per second
 		minimum_size: 50, //minimum size in px that the resizer will  go down to
 		canvasid: "body", //the overall parent for all movement constraints, any named DOM element, or if null a canvas is created from the visible window
+		grid: 10, //the size of a grid to snap modules to when dragging and resizing which is enabled within the running MM2
 	},
 
 	start: function () {
@@ -54,13 +55,13 @@ Module.register("MMM-ModulePosition", {
 	getScripts: function () {
 		return [
 			'moment.js',
-			'smoothpositioning.3.3.js'
+			'smoothpositioning.3.4.js'
 		]
 	},
 
 	getStyles: function () {
 		return [
-			'MMM-ModulePosition.css'
+			'MMM-ModulePosition.3.4.css'
 		]
 	},
 
@@ -186,6 +187,13 @@ Module.register("MMM-ModulePosition", {
 		this.savebutton.id = 'save-button';
 		this.savebutton.innerHTML = "Save Positions";
 
+		//add the grid toggle
+
+		this.gridtoggle = document.createElement("label");
+		this.gridtoggle.className = "switch";
+		this.gridtoggle.id = "gridtoggle";
+		this.gridtoggle.innerHTML = '<input id="s1" type="checkbox" checked onchange="togglegrid()">< span class="slider round"></span>';
+
 		//add the current item meta display
 
 		this.modulemeta = document.createElement('div');
@@ -223,6 +231,7 @@ Module.register("MMM-ModulePosition", {
 		this.modulemeta.appendChild(this.modulemetah);
 
 		this.wrapper.appendChild(this.savebutton);
+		this.wrapper.appendChild(this.gridtoggle);
 		this.wrapper.appendChild(this.modulemeta);
 		
 		if (this.savebutton.addEventListener) {
