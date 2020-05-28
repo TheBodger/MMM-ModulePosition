@@ -179,6 +179,7 @@ Module.register("MMM-ModulePosition", {
 		this.wrapper.style.position = 'absolute'
 		this.wrapper.style.left = '100px';
 		this.wrapper.style.top = '100px';
+		this.wrapper.style.width = '300px';
 
 		//add the save button
 
@@ -186,18 +187,25 @@ Module.register("MMM-ModulePosition", {
 		this.savebutton.className = 'save-button glass';
 		this.savebutton.id = 'save-button';
 		this.savebutton.innerHTML = "Save Positions";
+		this.savebutton.style.position = 'absolute'
+		this.savebutton.style.width = '148px';
 
 		//add the grid toggle
 
 		this.gridtoggle = document.createElement("label");
 		this.gridtoggle.className = "switch";
-		this.gridtoggle.id = "gridtoggle";
-		this.gridtoggle.innerHTML = '<input id="s1" type="checkbox" checked onchange="togglegrid()">< span class="slider round"></span>';
+		this.gridtoggle.innerHTML = '<input id="gridtoggle" type="checkbox" onchange="togglegrid()">';
+		this.gridtoggle.innerHTML += '<span class="slider round"> <span style="position:absolute; left:55px" class="xsmall" > GRID</span ></span>';
+		//this.gridtoggle.innerHTML += '<span class="xsmall">GRID</span>';
+		this.gridtoggle.style.left = '10px';
+		this.gridtoggle.style.top = '60px';
 
 		//add the current item meta display
 
 		this.modulemeta = document.createElement('div');
 		this.modulemeta.className = "metagrid";
+		this.modulemeta.style.position = "absolute";
+		this.modulemeta.style.left = '152px';
 
 		this.modulemetaname = document.createElement('div');
 		this.modulemetaname.className = "metagridname";

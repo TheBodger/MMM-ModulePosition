@@ -59,7 +59,8 @@ function smoothpositioninginit(smoothpositioningconfig) {
 	easeAmount = smoothpositioningconfig.easeAmount;
 	FPS = smoothpositioningconfig.FPS;
 	interval = 1000 / FPS;
-	minimum_size = smoothpositioningconfig.minimum_size ;
+	minimum_size = smoothpositioningconfig.minimum_size;
+	grid = smoothpositioningconfig.grid;
 
 }
 
@@ -123,7 +124,7 @@ function getcurrentmeta(element) {
 function togglegrid() {
 
 	if (grid > 0) {
-		usegrid = document.getElementById('gridtoggle');
+		usegrid = document.getElementById('gridtoggle').checked;
     }
 }
 
@@ -687,7 +688,7 @@ function mouseUpListener(event) {
 			resizing = false;
 			currentelement = currentelement.parentElement; // as we loose the resizer indicator, we need to let tick tock know which element to actually ease out
 		}
-		document.body.style.cursor = "default"
+		document.body.style.cursor = "auto"
 		window.removeEventListener("mousemove", mouseMoveListener, false);
 	}
 }
