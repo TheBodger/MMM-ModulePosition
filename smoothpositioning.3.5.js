@@ -8,6 +8,15 @@
 //uses grid to control size of grid - 1 should ensure current activity
 //applied when calculating the new target. uses code from  fabricjs
 
+// create 3.5
+//target location is calculated absolute
+//new target = (adjusted) mouse = mousedown delta
+//mousedown delta = mousedown - current
+//rename stallmeta to mousedown
+//adjust mouse to grid before resizing
+//todo - move grid snapping to edges - top left if moving, resizing all edges 
+//todo - stop the grid allowing elements to go out of bounds for certain values
+
 // JavaScript source code
 
 //each element carries 3 sets of information:
@@ -41,7 +50,7 @@ var currentelement;
 var timers = {};
 var dragging = false;
 var resizing = false;
-var stallmeta = {element:{x:0, y:0}, mousedown: {x:0,y:0}}
+var mousedown = {element:{x:0, y:0, w:0, h:0}, mouse: {x:0,y:0}}
 
 function smoothpositioninginit(smoothpositioningconfig) {
 
@@ -343,8 +352,8 @@ function mouseDownListener(event) {
 	//store the meta for the mousedown and element 
 	//so we can determine if the element dragging has stalled
 
-	stallmeta.mousedown.x = mouseX;
-	stallmeta.mousedown.y = mouseY;
+	mousedown.mouse.x = mouseX;
+	mousedown.mouse.y = mouseY;
 
 	//determine if we are dragging or resizing
 
@@ -375,6 +384,12 @@ function mouseDownListener(event) {
 
 		setmeta(parentelement, getmeta(parentelement).original, getcurrentmeta(parentelement), getcurrentmeta(parentelement), {x:0,y:0,w:0,h:0})
 		var currentmeta = getmeta(parentelement);
+
+		//store the location for mousedown delta calculation and resizing
+		mousedown.element.x = currentmeta.current.x;
+		mousedown.element.y = currentmeta.current.y;
+		mousedown.element.w = currentmeta.current.w;
+		mousedown.element.h = currentmeta.current.h;
 
 		//move the element
 		parentelement.style.top = Math.round(currentmeta.current.y - (currentmeta.current.h / 2)).toString() + 'px';
@@ -461,20 +476,25 @@ function mouseMoveListener(event) {
 	var mouseY = mouse.mouseY;
 
 	//determine if new target is in bounds
-	//test is based on the existing target being adjusted by the delta NOT the current location of the element as that is being ticked
-	//we need to take into account that resizing adjusts x or y and h or w as deltaX an deltaY change by creating a temporary new target before testing it
-	//delta(x,y) applied to oldtarget (x,y) must be between min(x,y) and max(x,y)
-	//otherwise clamp the delta to a value to adhere to the above rule
-
-	//mouse delta, try this first
-	var deltaX = mouseX - getmousemeta(element).mousemeta.x;
-	var deltaY = mouseY - getmousemeta(element).mousemeta.y;
+	//test is based on the existing target being moved to the new mouse location (-mousedown delta)
+	//otherwise clamp the mouse to a value to adhere to the above rule
 
 	if (resizing) {
 
-		//calculate the new element size and centre
-		checkmeta.target = getresizedelement(element, deltaX, deltaY, true);
+		checkmeta.target = getresizedelement(element, mouseX, mouseY);
+		if (usegrid) {
+			checkmeta.target = getresizedelement(element, Math.round(mouseX / grid) * grid, Math.round(mouseY / grid) * grid);
+		}
+	}
+	else
+	{
+		checkmeta.target.x = mouseX - (mousedown.mouse.x - mousedown.element.x);
+		checkmeta.target.y = mouseY - (mousedown.mouse.y - mousedown.element.y);
 
+		if (usegrid) {
+			checkmeta.target.x = Math.round(mouseX / grid) * grid - (mousedown.mouse.x - mousedown.element.x);
+			checkmeta.target.y = Math.round(mouseY / grid) * grid - (mousedown.mouse.y - mousedown.element.y);
+		}
 	}
 
 	//calculate the bounds based on the new target size 
@@ -485,124 +505,44 @@ function mouseMoveListener(event) {
 
 	//check the centre fits within the bounds
 
-	if (resizing) {
-		//checkmax returns a -value if out of bounds
-		//checkmin returns a +value if out of bounds
-		var checkmaxX = (maxX - checkmeta.target.x);
-		var checkmaxY = (maxY - checkmeta.target.y);
-		var checkminX = (minX - checkmeta.target.x);
-		var checkminY = (minY - checkmeta.target.y);
-	}
-	else {
-
-		var checkmaxX = Math.round(maxX - (checkmeta.target.x + deltaX));
-		var checkmaxY = Math.round(maxY - (checkmeta.target.y + deltaY));
-		var checkminX = Math.round(minX - (checkmeta.target.x + deltaX));
-		var checkminY = Math.round(minY - (checkmeta.target.y + deltaY));
-    }
+	//checkmax returns a -value if out of bounds
+	//checkmin returns a +value if out of bounds
+	var checkmaxX = (maxX - checkmeta.target.x);
+	var checkmaxY = (maxY - checkmeta.target.y);
+	var checkminX = (minX - checkmeta.target.x);
+	var checkminY = (minY - checkmeta.target.y);
 
 	//adjust the new mouse position to take into account any out of bounds amounts
 	//if any neg max values or pos min values
 	mouseX = mouseX + ((checkminX > 0) ? checkminX : 0) + ((checkmaxX < 0) ? checkmaxX : 0);
 	mouseY = mouseY + ((checkminY > 0) ? checkminY : 0) + ((checkmaxY < 0) ? checkmaxY : 0);
 
-	//recalculate the mouse delta based on the revised mouse position
-	var deltaX = mouseX - getmousemeta(element).mousemeta.x;
-	var deltaY = mouseY - getmousemeta(element).mousemeta.y;
-
 	//store the new mouse location
-	setmousemeta(element, { x: mouseX, y: mouseY, deltaX: deltaX, deltaY: deltaY });
+	setmousemeta(element, { x: mouseX, y: mouseY, deltaX: 0, deltaY: 0 });
 
 	if (resizing)
-	//store the new target
+	//store the new target after grid adjusting
 	{
-		currentmeta.target = getresizedelement(element, deltaX, deltaY);
+		currentmeta.target = getresizedelement(element, mouseX,mouseY);
 
 		if (usegrid) {
-			//console.log("B", currentmeta.target.x, currentmeta.target.y);
-			currentmeta.target.x = Math.round(currentmeta.target.x / grid) * grid;
-			currentmeta.target.y = Math.round(currentmeta.target.y / grid) * grid;
-			currentmeta.target.w = Math.round(currentmeta.target.w / grid) * grid;
-			currentmeta.target.h = Math.round(currentmeta.target.h / grid) * grid;
-			//console.log("A", currentmeta.target.x, currentmeta.target.y);
-		
-			console.log("X", deltaX, grid, Math.abs(deltaX) < grid / 2);
-
-			if (deltaX != 0 && Math.abs(deltaX) < grid / 2) {
-
-				console.log(mouseX, stallmeta.mousedown.x, Math.abs(mouseX - stallmeta.mousedown.x) > grid / 2);
-
-				if (Math.abs(mouseX - stallmeta.mousedown.x) > grid / 2) {
-					var tgrid = grid * ((mouseX > stallmeta.mousedown.x) ? 1 : -1.05);
-					console.log("tgrid", tgrid, currentmeta.target.x);
-					currentmeta.target.x = Math.round((currentmeta.target.x + (tgrid / 2)) / grid) * grid;
-					console.log("adjusted", currentmeta.target.x, currentmeta.current.x);
-					stallmeta.mousedown.x = mouseX;
-				}
-
-			}
-			console.log("Y", deltaY, grid, Math.abs(deltaY) < grid / 2);
-			if (deltaY != 0 && Math.abs(deltaY) < grid / 2) {
-
-				if (Math.abs(mouseY - stallmeta.mousedown.y) > grid / 2) {
-					var tgrid = grid * ((mouseY > stallmeta.mousedown.y) ? 1 : -1.05);
-					currentmeta.target.y = Math.round((currentmeta.target.y + (tgrid / 2)) / grid) * grid;
-					stallmeta.mousedown.y = mouseY;
-				}
-
-			}
+			currentmeta.target = getresizedelement(element, Math.round(mouseX / grid) * grid, Math.round(mouseY / grid) * grid);
 		}
 		setmeta(element.parentElement, getmeta(element.parentElement).original, currentmeta.current, currentmeta.target, currentmeta.step);
 		setgrid(element.parentElement.id, getmeta(element.parentElement).current);
 	}
 	else {
 
-		//the target is the current target + the calculated delta, 
-		//as the currentX represents some position between originalx and the target, we add the delta to the target
+		//the target is the adjusted mouse inbounds
 		//use grid calculation to adjust the target to snap to the grid
-
-		//calculate the real target
-		currentmeta.target.x = Math.round(currentmeta.target.x + deltaX);
-		currentmeta.target.y = Math.round(currentmeta.target.y + deltaY);
-
 		//adjust to snap if active
+		//recalculate the target based on the revised mouse position
+		currentmeta.target.x = mouseX - (mousedown.mouse.x - mousedown.element.x);
+		currentmeta.target.y = mouseY - (mousedown.mouse.y - mousedown.element.y);
 
 		if (usegrid) {
-			//console.log("B", currentmeta.target.x, currentmeta.target.y);
-			currentmeta.target.x = Math.round(currentmeta.target.x / grid) * grid;
-			currentmeta.target.y = Math.round(currentmeta.target.y / grid) * grid;
-			//console.log("A", currentmeta.target.x, currentmeta.target.y);
-			//check for stalled movement
-			//we moved but less than the amount needed to move to the next grid position
-			//so we check the absolute movement since mousedown and if it is enough to move to the next grid adjust the target, either + or - depending on current travel direction
-			//and then readjust the mousedown to the current mouse location so that we restart the process
-
-			console.log("X", deltaX, grid, Math.abs(deltaX) < grid / 2);
-
-			if (deltaX != 0 && Math.abs(deltaX) < grid / 2) {
-
-				console.log(mouseX, stallmeta.mousedown.x, Math.abs(mouseX - stallmeta.mousedown.x) > grid / 2);
-
-				if (Math.abs(mouseX - stallmeta.mousedown.x) > grid / 2) {
-					var tgrid = grid * ((mouseX > stallmeta.mousedown.x) ? 1 : -1.05);
-					console.log("tgrid", tgrid, currentmeta.target.x );
-					currentmeta.target.x = Math.round((currentmeta.target.x + (tgrid / 2)) / grid) * grid;
-					console.log("adjusted", currentmeta.target.x, currentmeta.current.x);
-					stallmeta.mousedown.x = mouseX;
-                }
-
-			}
-			console.log("Y",deltaY, grid, Math.abs(deltaY) < grid / 2);
-			if (deltaY != 0 && Math.abs(deltaY) < grid / 2) {
-
-				if (Math.abs(mouseY - stallmeta.mousedown.y) > grid / 2) {
-					var tgrid = grid * ((mouseY > stallmeta.mousedown.y) ? 1 : -1.05);
-					currentmeta.target.y = Math.round((currentmeta.target.y + (tgrid / 2)) / grid) * grid;
-					stallmeta.mousedown.y = mouseY;
-				}
-
-			}
-
+			currentmeta.target.x = Math.round(mouseX / grid) * grid - (mousedown.mouse.x - mousedown.element.x);
+			currentmeta.target.y = Math.round(mouseY / grid) * grid - (mousedown.mouse.y - mousedown.element.y);
 		}
 			
 		//store the new target
@@ -610,65 +550,73 @@ function mouseMoveListener(event) {
 		setgrid(element.id, getmeta(element).current);
 	}
 
-
 }
 
-function getresizedelement(element, deltaX, deltaY,roundvalues=false) {
+function getresizedelement(element, mouseX, mouseY, roundvalues = false) {
+
+	//we get the resize element and the new mouse location
+	//we know the original mouse location and the centre of the element at mousedown
+
+	//calculate new resizer locations based on the delta between mouse new and mouse down
+	//applied to the current location
+
+	var deltaX = (mouseX - mousedown.mouse.x)
+	var deltaY = (mouseY - mousedown.mouse.y)
 
 	var currentmeta = getmeta(element.parentElement);
 	var tempmeta = currentmeta.target;
 
 	if (element.classList.contains('bottom-right')) {
-		const width = currentmeta.target.w + deltaX;
-		const height = currentmeta.target.h + deltaY;
+		const width = mousedown.element.w + deltaX;
+		const height = mousedown.element.h + deltaY;
 		if (width > minimum_size) {
 			tempmeta.w = width;
-			tempmeta.x = currentmeta.target.x + (deltaX / 2);
+			tempmeta.x = mousedown.element.x + (deltaX / 2);
 
 		}
 		if (height > minimum_size) {
 			tempmeta.h = height;
-			tempmeta.y = currentmeta.target.y + (deltaY / 2);
+			tempmeta.y = mousedown.element.y + (deltaY / 2);
 		}
 	}
 
 	else if (element.classList.contains('bottom-left')) {
-		const height = currentmeta.target.h + deltaY;
-		const width = currentmeta.target.w - deltaX;
+		const height = mousedown.element.h + deltaY;
+		const width = mousedown.element.w - deltaX;
 		if (height > minimum_size) {
 			tempmeta.h = height;
-			tempmeta.y = currentmeta.target.y + (deltaY / 2);
+			tempmeta.y = mousedown.element.y + (deltaY / 2);
 		}
 		if (width > minimum_size) {
 			tempmeta.w = width;
-			tempmeta.x = currentmeta.target.x + (deltaX / 2);
+			tempmeta.x = mousedown.element.x + (deltaX / 2);
 		}
 	}
 
 	else if (element.classList.contains('top-right')) {
-		const width = currentmeta.target.w + deltaX;
-		const height = currentmeta.target.h - deltaY;
+		const width = mousedown.element.w + deltaX;
+		const height = mousedown.element.h - deltaY;
 		if (width > minimum_size) {
 			tempmeta.w = width;
-			tempmeta.x = currentmeta.target.x + (deltaX / 2);
+			tempmeta.x = mousedown.element.x + (deltaX / 2);
 		}
 		if (height > minimum_size) {
 			tempmeta.h = height;
-			tempmeta.y = currentmeta.target.y + (deltaY / 2);
+			tempmeta.y = mousedown.element.y + (deltaY / 2);
 
 		}
 	}
 
 	else {//top-left
-		const width = currentmeta.target.w - deltaX;
-		const height = currentmeta.target.h - deltaY;
+		const width = mousedown.element.w - deltaX;
+		const height = mousedown.element.h - deltaY;
 		if (width > minimum_size) {
 			tempmeta.w = width;
-			tempmeta.x = currentmeta.target.x + (deltaX/2);
+			tempmeta.x = mousedown.element.x + (deltaX/2);
 		}
 		if (height > minimum_size) {
 			tempmeta.h = height;
-			tempmeta.y = currentmeta.target.y + (deltaY/2);
+			tempmeta.y = mousedown.element.y + (deltaY/2);
 		}
 	}
 

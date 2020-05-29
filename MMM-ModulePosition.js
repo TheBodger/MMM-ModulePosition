@@ -55,7 +55,7 @@ Module.register("MMM-ModulePosition", {
 	getScripts: function () {
 		return [
 			'moment.js',
-			'smoothpositioning.3.4.js'
+			'smoothpositioning.3.5.js'
 		]
 	},
 
