@@ -14,7 +14,7 @@
 //mousedown delta = mousedown - current
 //rename stallmeta to mousedown
 //adjust mouse to grid before resizing
-//todo - move grid snapping to edges - top left if moving, resizing all edges 
+//todo - move grid snapping to edges - leading edge(s) 
 //todo - stop the grid allowing elements to go out of bounds for certain values
 
 // JavaScript source code
@@ -165,8 +165,8 @@ function makedraggable(element) {
 
 	setmeta(element, origmeta, origmeta, origmeta, { x: 0, y: 0, w: 0, h: 0 });
 
-	//console.log("ox", origmeta.x, origmeta.w);
-	//console.log("oy", origmeta.y, origmeta.h);
+	////console.log("ox", origmeta.x, origmeta.w);
+	////console.log("oy", origmeta.y, origmeta.h);
 
 	//apply absolute, store the new location and reset to the original positioning
 	//this gives us any positioning deltas we need to apply to the CSS when we create the custom CSS
@@ -223,8 +223,8 @@ function makedraggable(element) {
 				if (state.active || state.absolute) {
 					var oldvalue = getstyleasjson(mutation.oldValue);
 					if (oldvalue != null) {
-						//console.log('The ' + mutation.attributeName + ' attribute of element ' + mutation.target.id + ' was modified. Old value was ' + oldvalue.position);
-						//console.log('The new position is ' + mutation.target.style.position);
+						////console.log('The ' + mutation.attributeName + ' attribute of element ' + mutation.target.id + ' was modified. Old value was ' + oldvalue.position);
+						////console.log('The new position is ' + mutation.target.style.position);
 						if (mutation.target.style.postion != 'absolute') {
 							mutation.target.style.position = 'absolute'
 						};
@@ -451,8 +451,12 @@ function mouseMoveListener(event) {
 	//new mouse becomes target
 	//after clamping to the canvas
 
-	//because we are moving we stick with the current element and dont try to determine who we are moving over
+	//because we are moving we stick with the current element and don't try to determine who we are moving over
 	//otherwise the mouseover finds another valid element
+
+	//added detection of the leading edge(s) when using the grid.
+	//the leading edge(s) will snap to the nearest grid - in the direction of travel only
+	//so the snap only occurs if the move/resize of the element will be in the expected direction
 
 	var element = currentelement; 
 
@@ -468,7 +472,10 @@ function mouseMoveListener(event) {
 		setstate(element, true, getstate(element).active, getstate(element).absolute); //set amended true
 	}
 
-	var checkmeta = { target: currentmeta.target };
+	//console.log("MD", currentmeta.target.x, currentmeta.target.y,usegrid)
+
+	var checkmeta = {
+		target: { x: currentmeta.target.x, y: currentmeta.target.y, w: currentmeta.target.w, h: currentmeta.target.h} };
 
 	//get new mouse position
 	var mouse = getmouseposition(event);
@@ -478,6 +485,19 @@ function mouseMoveListener(event) {
 	//determine if new target is in bounds
 	//test is based on the existing target being moved to the new mouse location (-mousedown delta)
 	//otherwise clamp the mouse to a value to adhere to the above rule
+	//takes into account that a  grid snap may take the element out of bounds
+
+	//the following are used to track the leading edge(s) by determining travel direction
+	//0 = no travel - ignore
+	//+ve towards right/down
+	//-ve towards left/top
+
+	//calculate direction and stores as -1 0 or +1
+	var dx = mouseX - mousedown.element.x;
+	var dy = mouseY - mousedown.element.y;
+
+	dx = (dx < 0) ? -1 : (dx > 0 ? 1 : 0);
+	dy = (dy < 0) ? -1 : (dy > 0 ? 1 : 0);
 
 	if (resizing) {
 
@@ -488,14 +508,43 @@ function mouseMoveListener(event) {
 	}
 	else
 	{
+		//console.log("MD1stnotresize", currentmeta.target.x, currentmeta.target.y)
+
 		checkmeta.target.x = mouseX - (mousedown.mouse.x - mousedown.element.x);
 		checkmeta.target.y = mouseY - (mousedown.mouse.y - mousedown.element.y);
 
+		//console.log("MD2ndnotresize", currentmeta.target.x, currentmeta.target.y)
+
 		if (usegrid) {
-			checkmeta.target.x = Math.round(mouseX / grid) * grid - (mousedown.mouse.x - mousedown.element.x);
-			checkmeta.target.y = Math.round(mouseY / grid) * grid - (mousedown.mouse.y - mousedown.element.y);
-		}
+
+			//console.log("MD1stUseGrid", currentmeta.target.x, currentmeta.target.y)
+			//only try and snap the edges that are leading and only in the direction of travel
+			//if snap is +ve and travel -ve ignore and vice versa
+			//requires calculating the edge location now we have done first move but not checked for bounds
+
+			//calculate the leading edge(s) x and y 
+
+			var lex = checkmeta.target.x + ((currentmeta.current.w / 2) * dx);
+			var ley = checkmeta.target.y + ((currentmeta.current.h / 2) * dy);
+
+			//check if a snap is in the right direction
+			//and then calculate a new target to make the element move the leading edge to the correct position
+
+			////console.log(dx, dy, lex, ley, checkmeta.target.x, checkmeta.target.y, currentmeta.current.w, currentmeta.current.h);
+
+			if ((dx == -1 && lex > Math.round(lex / grid) * grid) || (dx == 1 && lex < Math.round(lex / grid) * grid)) {
+				checkmeta.target.x = (Math.round(lex / grid) * grid) - ((currentmeta.current.w / 2) * dx);
+			}
+
+			if ((dy == -1 && ley > Math.round(ley / grid) * grid) || (dy == 1 && ley < Math.round(ley / grid) * grid)) {
+				checkmeta.target.y = (Math.round(ley / grid) * grid) - ((currentmeta.current.h / 2) * dy);
+			}
+			////console.log(0,0,0,0, checkmeta.target.x, checkmeta.target.y);
+        }
+
 	}
+
+	//console.log("MD1stCalc", currentmeta.target.x, currentmeta.target.y)
 
 	//calculate the bounds based on the new target size 
 	var minX = (checkmeta.target.w / 2);
@@ -520,6 +569,8 @@ function mouseMoveListener(event) {
 	//store the new mouse location
 	setmousemeta(element, { x: mouseX, y: mouseY, deltaX: 0, deltaY: 0 });
 
+	//console.log("MDReCalc", currentmeta.target.x, currentmeta.target.y)
+
 	if (resizing)
 	//store the new target after grid adjusting
 	{
@@ -537,14 +588,41 @@ function mouseMoveListener(event) {
 		//use grid calculation to adjust the target to snap to the grid
 		//adjust to snap if active
 		//recalculate the target based on the revised mouse position
-		currentmeta.target.x = mouseX - (mousedown.mouse.x - mousedown.element.x);
-		currentmeta.target.y = mouseY - (mousedown.mouse.y - mousedown.element.y);
+
+		checkmeta.target.x = mouseX - (mousedown.mouse.x - mousedown.element.x);
+		checkmeta.target.y = mouseY - (mousedown.mouse.y - mousedown.element.y);
 
 		if (usegrid) {
-			currentmeta.target.x = Math.round(mouseX / grid) * grid - (mousedown.mouse.x - mousedown.element.x);
-			currentmeta.target.y = Math.round(mouseY / grid) * grid - (mousedown.mouse.y - mousedown.element.y);
+
+			//recalculate the leading edge(s) x and y 
+
+			var lex = checkmeta.target.x + ((currentmeta.current.w / 2) * dx);
+			var ley = checkmeta.target.y + ((currentmeta.current.h / 2) * dy);
+
+			//check if a snap is in the right direction
+			//and then calculate a new target to make the element move the leading edge to the correct position
+
+			console.log(dx, dy, lex, ley, (Math.round(lex / grid) * grid), (Math.round(ley / grid) * grid), checkmeta.target.x, checkmeta.target.y, currentmeta.current.w, currentmeta.current.h);
+
+			if ((dx == -1 && lex > Math.round(lex / grid) * grid) || (dx == 1 && lex < Math.round(lex / grid) * grid)) {
+				currentmeta.target.x = (Math.round(lex / grid) * grid) - ((currentmeta.current.w / 2) * dx);
+				console.log(0, 0, 0, 0, currentmeta.target.x, currentmeta.target.y);
+			}
+
+			if ((dy == -1 && ley > Math.round(ley / grid) * grid) || (dy == 1 && ley < Math.round(ley / grid) * grid)) {
+				currentmeta.target.y = (Math.round(ley / grid) * grid) - ((currentmeta.current.h / 2) * dy);
+			}
+
 		}
-			
+		else {
+
+			//no grid so just use the new location
+			currentmeta.target.x = checkmeta.target.x;
+			currentmeta.target.y = checkmeta.target.y;
+        }
+
+		//console.log("MDExit", currentmeta.target.x, currentmeta.target.y)
+
 		//store the new target
 		setmeta(element, getmeta(element).original, currentmeta.current, currentmeta.target, currentmeta.step);
 		setgrid(element.id, getmeta(element).current);
@@ -639,6 +717,8 @@ function onTimerTick() {
 
 	var currentmeta = getmeta(actionelement);
 
+	//console.log("tick", currentmeta.target.x, currentmeta.target.y);
+
 	//calculate the step
 	currentmeta.step.x = easeAmount * (currentmeta.target.x - currentmeta.current.x);
 	currentmeta.step.y = easeAmount * (currentmeta.target.y - currentmeta.current.y);
@@ -674,7 +754,9 @@ function onTimerTick() {
 		}
 
 	//save the new location
-	setmeta(actionelement, getmeta(actionelement).original,currentmeta.current, currentmeta.target, currentmeta.step)
+	setmeta(actionelement, getmeta(actionelement).original, currentmeta.current, currentmeta.target, currentmeta.step)
+
+	//console.log("tock", currentmeta.target.x, currentmeta.target.y);
 
 	//move the element
 	actionelement.style.top = Math.round(currentmeta.current.y - (currentmeta.current.h / 2)).toString() + 'px';

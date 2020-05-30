@@ -1,6 +1,14 @@
 ﻿html {
     cursor:auto;
+        }
+
+body {
+    margin: 50px;
+    background-size: 50px 50px;
+    /*background-image: radial-gradient(circle, white 1px, black 1px);*/
+    background-image: linear-gradient(to right, grey 1px, transparent 1px), linear-gradient(to bottom, grey 1px, transparent 1px);
 }
+
 .resizable {
     background: white;
     box-sizing: border-box;
