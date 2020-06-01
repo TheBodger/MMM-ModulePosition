@@ -524,7 +524,6 @@ function mouseMoveListener(event) {
 			currentmeta.target.y = Math.round(currentmeta.target.y / grid) * grid;
 			currentmeta.target.w = Math.round(currentmeta.target.w / grid) * grid;
 			currentmeta.target.h = Math.round(currentmeta.target.h / grid) * grid;
-			//console.log("A", currentmeta.target.x, currentmeta.target.y);
 		
 			console.log("X", deltaX, grid, Math.abs(deltaX) < grid / 2);
 

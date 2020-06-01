@@ -13,9 +13,13 @@
 //new target = (adjusted) mouse = mousedown delta
 //mousedown delta = mousedown - current
 //rename stallmeta to mousedown
-//adjust mouse to grid before resizing
-//todo - move grid snapping to edges - leading edge(s) 
-//todo - stop the grid allowing elements to go out of bounds for certain values
+//adjust delta to grid before resizing
+//move grid snapping to edges - leading edge(s) 
+//stop the grid allowing elements to go out of bounds for certain values - mostly
+
+//todo - amend grid size in meta screen display
+//todo - drag the meta display
+//todo - 
 
 // JavaScript source code
 
