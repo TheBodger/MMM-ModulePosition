@@ -50,7 +50,7 @@ var currentelement;
 var timers = {};
 var dragging = false;
 var resizing = false;
-var mousedown = { element: { x: 0, y: 0, w: 0, h: 0 }, mouse: { x: 0, y: 0 }, mousemoved: { x: 0, y: 0 }}
+var mousedown = { element: { x: 0, y: 0, w: 0, h: 0 }, mouse: { x: 0, y: 0 }, mousemoved: { x: 0, y: 0 }, snappedx: false, snappedy: false}
 
 function smoothpositioninginit(smoothpositioningconfig) {
 
@@ -165,9 +165,6 @@ function makedraggable(element) {
 
 	setmeta(element, origmeta, origmeta, origmeta, { x: 0, y: 0, w: 0, h: 0 });
 
-	////console.log("ox", origmeta.x, origmeta.w);
-	////console.log("oy", origmeta.y, origmeta.h);
-
 	//apply absolute, store the new location and reset to the original positioning
 	//this gives us any positioning deltas we need to apply to the CSS when we create the custom CSS
 
@@ -223,8 +220,6 @@ function makedraggable(element) {
 				if (state.active || state.absolute) {
 					var oldvalue = getstyleasjson(mutation.oldValue);
 					if (oldvalue != null) {
-						////console.log('The ' + mutation.attributeName + ' attribute of element ' + mutation.target.id + ' was modified. Old value was ' + oldvalue.position);
-						////console.log('The new position is ' + mutation.target.style.position);
 						if (mutation.target.style.postion != 'absolute') {
 							mutation.target.style.position = 'absolute'
 						};
@@ -358,6 +353,10 @@ function mouseDownListener(event) {
 
 	mousedown.mousemoved.x = mouseX;
 	mousedown.mousemoved.y = mouseY;
+
+	// and for snap control in grids / resizing reset snapped to false
+
+	mousedown.snapped = false;
 
 	//determine if we are dragging or resizing
 
@@ -528,8 +527,6 @@ function mouseMoveListener(event) {
 			//check if a snap is in the right direction
 			//and then calculate a new target to make the element move the leading edge to the correct position
 
-			console.log(dx, dy, lex, ley, checkmeta.target.x, checkmeta.target.y, currentmeta.current.w, currentmeta.current.h);
-
 			if ((dx == -1 && lex > Math.round(lex / grid) * grid) || (dx == 1 && lex < Math.round(lex / grid) * grid)) {
 				checkmeta.target.x = (Math.round(lex / grid) * grid) - ((currentmeta.current.w / 2) * dx);
 			}
@@ -537,7 +534,7 @@ function mouseMoveListener(event) {
 			if ((dy == -1 && ley > Math.round(ley / grid) * grid) || (dy == 1 && ley < Math.round(ley / grid) * grid)) {
 				checkmeta.target.y = (Math.round(ley / grid) * grid) - ((currentmeta.current.h / 2) * dy);
 			}
-			console.log(0,0,0,0, checkmeta.target.x, checkmeta.target.y);
+
         }
 
 	}
@@ -594,16 +591,12 @@ function mouseMoveListener(event) {
 			//check if a snap is in the right direction
 			//and then calculate a new target to make the element move the leading edge to the correct position
 
-			console.log(dx, dy, lex, ley, (Math.round(lex / grid) * grid), (Math.round(ley / grid) * grid), checkmeta.target.x, checkmeta.target.y, currentmeta.current.w, currentmeta.current.h);
-
 			if ((dx == -1 && lex > Math.round(lex / grid) * grid) || (dx == 1 && lex < Math.round(lex / grid) * grid)) {
 				currentmeta.target.x = (Math.round(lex / grid) * grid) - ((currentmeta.current.w / 2) * dx);
-				console.log(0, 0, 0, 0, currentmeta.target.x, currentmeta.target.y);
 			}
 
 			if ((dy == -1 && ley > Math.round(ley / grid) * grid) || (dy == 1 && ley < Math.round(ley / grid) * grid)) {
 				currentmeta.target.y = (Math.round(ley / grid) * grid) - ((currentmeta.current.h / 2) * dy);
-				console.log(0, 0, 0, 0, currentmeta.target.x, currentmeta.target.y);
 			}
 
 		}
@@ -626,6 +619,61 @@ function mouseMoveListener(event) {
 
 }
 
+function getgriddelta(dx, dy, dxt, dyt, deltaX, deltaY) {
+
+	// calc new leading edge positions 
+	var lex = (mousedown.element.x + (mousedown.element.w / 2) * dx) + (deltaX);
+	var ley = (mousedown.element.y + (mousedown.element.h / 2) * dy) + (deltaY);
+
+	//and snap to the nearest grid position
+	//adjust the delta by the difference between the leading edge and the nearest snap, regardless of direction of movement
+	//once we have have determined we can start snapping
+	//we need accurate direction of travel until first snap
+
+	//calculate the nearest grid
+	var snaptox = (Math.round(lex / grid) * grid);
+	var snaptoy = (Math.round(ley / grid) * grid);
+
+	if (!mousedown.snappedx) {
+
+		//if the leading edge is in the snap zone based on the direction of travel, start snapping
+		//otherwise wait until it is
+		//snap zone is 1/2 grid either side of the grid depending on the direction of travel
+
+		if (
+			(dxt == 1 && (lex > snaptox - ((grid / 2) * dxt) && lex < snaptox)) ||
+			(dxt == -1 && (lex < snaptox - ((grid / 2) * dxt) && lex > snaptox))
+		) {
+			mousedown.snappedx = true;
+		}
+		else {
+			deltaX = 0;
+		}
+	}
+
+	if (mousedown.snappedx) {
+		deltaX = deltaX + (snaptox - lex);
+	}
+
+	if (!mousedown.snappedy) {
+		if (
+			(dyt == 1 && (ley > snaptoy - ((grid / 2) * dyt) && ley < snaptoy)) ||
+			(dyt == -1 && (ley < snaptoy - ((grid / 2) * dyt) && ley > snaptoy))
+		) {
+			mousedown.snappedy = true;
+		}
+		else {
+			deltaY = 0;
+		}
+	}
+
+	if (mousedown.snappedy) {
+		deltaY = deltaY + (snaptoy - ley);
+	}
+
+	return {deltaX,deltaY}
+}
+
 function getresizedelement(element, mouseX, mouseY, roundvalues = false) {
 
 	//we get the resize element and the new mouse location
@@ -642,65 +690,26 @@ function getresizedelement(element, mouseX, mouseY, roundvalues = false) {
 	var dx = 0;
 	var dy = 0;
 
-	var dxt = (deltaX < 0) ? -1 : (deltaX > 0 ? 1 : 0);
+	var dxt = (mouseX > mousedown.mousemoved.x) ? 1 : (mouseX < mousedown.mousemoved.x ? -1 : 0);
 	var dyt = (deltaY < 0) ? -1 : (deltaY > 0 ? 1 : 0);
 
 	var currentmeta = getmeta(element.parentElement);
 	var tempmeta = currentmeta.target;
 
-	var width=0, height=0;
+	var width = 0, height = 0;
 
 	if (element.classList.contains('bottom-right')) {
+
+		//set the direction for right and bottom
 
 		dx = 1;
 		dy = 1;
 
-		//if usegrid adjust the delta to snap to the nearest grid,
-		//based on travel direction
-
 		if (usegrid) {
-
-			// calc new leading edge positions 
-			var lex = (mousedown.element.x + (mousedown.element.w / 2) * dx) + (deltaX * dx);
-			var ley = (mousedown.element.y + (mousedown.element.h / 2) * dy) + (deltaY * dy);
-
-			if ((dxt == -1 && lex > Math.round(lex / grid) * grid) || (dxt == 1 && lex < Math.round(lex / grid) * grid)) {
-				console.log("M", dx, dy, dxt, dyt, lex, ley, deltaX, deltaY, mouseX, mousedown.mousemoved.x);
-				deltaX = deltaX + (((Math.round(lex / grid) * grid) - lex) * dxt);
-			}
-			else { //leave the edge where it is - no movement
-				
-
-				var snaptox = Math.round(lex / grid) * grid;
-
-				console.log("B", dx, dy, dxt, dyt, lex, ley, deltaX, deltaY, mouseX, mousedown.mousemoved.x,snaptox);
-
-				if (Math.abs(deltaX) < grid/2) {
-					deltaX = 0;
-				}
-				else {
-					deltaX = deltaX - ((lex - snaptox) * dxt);
-				}
-
-            }
-
-			if ((dyt == -1 && ley > Math.round(ley / grid) * grid) || (dyt == 1 && ley < Math.round(ley / grid) * grid)) {
-				deltaY = deltaY + (((Math.round(ley / grid) * grid) - ley) * dyt);
-			}
-			else {
-				var snaptoy = Math.round(ley / grid) * grid;
-
-				if (Math.abs(deltaY) < grid / 2) { 
-					deltaY = 0;
-				}
-				else {
-					deltaY = deltaY - ((ley - snaptoy) * dyt);
-				}
-            }
-
-			console.log("A",deltaX, deltaY);
-
-        }
+			var deltas = getgriddelta(dx, dy, dxt, dyt, deltaX, deltaY);
+			deltaX = deltas.deltaX;
+			deltaY = deltas.deltaY;
+		}
 
 		width = mousedown.element.w + deltaX;
 		height = mousedown.element.h + deltaY;
@@ -723,108 +732,37 @@ function getresizedelement(element, mouseX, mouseY, roundvalues = false) {
 
 		if (usegrid) {
 
-			// calc new leading edge positions 
-			var lex = (mousedown.element.x + (mousedown.element.w / 2) * dx) + (deltaX * dx);
-			var ley = (mousedown.element.y + (mousedown.element.h / 2) * dy) + (deltaY * dy);
-
-			if ((dxt == -1 && lex > Math.round(lex / grid) * grid) || (dxt == 1 && lex < Math.round(lex / grid) * grid)) {
-				console.log("M", dx, dy, dxt, dyt, lex, ley, deltaX, deltaY, mouseX, mousedown.mousemoved.x);
-				deltaX = deltaX + (((Math.round(lex / grid) * grid) - lex) * dxt);
-			}
-			else { //leave the edge where it is - no movement
-
-
-				var snaptox = Math.round(lex / grid) * grid;
-
-				console.log("B", dx, dy, dxt, dyt, lex, ley, deltaX, deltaY, mouseX, mousedown.mousemoved.x, snaptox);
-
-				if (Math.abs(deltaX) < grid / 2) {
-					deltaX = 0;
-				}
-				else {
-					deltaX = deltaX - ((lex - snaptox) * dxt);
-				}
-
-			}
-
-			if ((dyt == -1 && ley > Math.round(ley / grid) * grid) || (dyt == 1 && ley < Math.round(ley / grid) * grid)) {
-				deltaY = deltaY + (((Math.round(ley / grid) * grid) - ley) * dyt);
-			}
-			else {
-				var snaptoy = Math.round(ley / grid) * grid;
-
-				if (Math.abs(deltaY) < grid / 2) {
-					deltaY = 0;
-				}
-				else {
-					deltaY = deltaY - ((ley - snaptoy) * dyt);
-				}
-			}
-
-			console.log("A", deltaX, deltaY);
+			var deltas = getgriddelta(dx, dy, dxt, dyt, deltaX, deltaY);
+			deltaX = deltas.deltaX;
+			deltaY = deltas.deltaY;
 
 		}
 
 		width = mousedown.element.w - deltaX;
 		height = mousedown.element.h + deltaY;
 
-			if (height >= minimum_size) {
-				tempmeta.h = height;
-				tempmeta.y = mousedown.element.y + (deltaY / 2);
-			}
-			if (width >= minimum_size) {
-				tempmeta.w = width;
-				tempmeta.x = mousedown.element.x + (deltaX / 2);
-			}
+		if (height >= minimum_size) {
+			tempmeta.h = height;
+			tempmeta.y = mousedown.element.y + (deltaY / 2);
+		}
+
+		if (width >= minimum_size) {
+			tempmeta.w = width;
+			tempmeta.x = mousedown.element.x + (deltaX / 2);
+		}
 	}
 
 	else if (element.classList.contains('top-right')) {
 			dx = 1;
 			dy = -1;
 
-		if (usegrid) {
+			if (usegrid) {
 
-			// calc new leading edge positions 
-			var lex = (mousedown.element.x + (mousedown.element.w / 2) * dx) + (deltaX * dx);
-			var ley = (mousedown.element.y + (mousedown.element.h / 2) * dy) + (deltaY * dy);
-
-			if ((dxt == -1 && lex > Math.round(lex / grid) * grid) || (dxt == 1 && lex < Math.round(lex / grid) * grid)) {
-				console.log("M", dx, dy, dxt, dyt, lex, ley, deltaX, deltaY, mouseX, mousedown.mousemoved.x);
-				deltaX = deltaX + (((Math.round(lex / grid) * grid) - lex) * dxt);
-			}
-			else { //leave the edge where it is - no movement
-
-
-				var snaptox = Math.round(lex / grid) * grid;
-
-				console.log("B", dx, dy, dxt, dyt, lex, ley, deltaX, deltaY, mouseX, mousedown.mousemoved.x, snaptox);
-
-				if (Math.abs(deltaX) < grid / 2) {
-					deltaX = 0;
-				}
-				else {
-					deltaX = deltaX - ((lex - snaptox) * dxt);
-				}
+				var deltas = getgriddelta(dx, dy, dxt, dyt, deltaX, deltaY);
+				deltaX = deltas.deltaX;
+				deltaY = deltas.deltaY;
 
 			}
-
-			if ((dyt == -1 && ley > Math.round(ley / grid) * grid) || (dyt == 1 && ley < Math.round(ley / grid) * grid)) {
-				deltaY = deltaY + (((Math.round(ley / grid) * grid) - ley) * dyt);
-			}
-			else {
-				var snaptoy = Math.round(ley / grid) * grid;
-
-				if (Math.abs(deltaY) < grid / 2) {
-					deltaY = 0;
-				}
-				else {
-					deltaY = deltaY - ((ley - snaptoy) * dyt);
-				}
-			}
-
-			console.log("A", deltaX, deltaY);
-
-		}
 
 			width = mousedown.element.w + deltaX;
 			height = mousedown.element.h - deltaY;
@@ -833,6 +771,7 @@ function getresizedelement(element, mouseX, mouseY, roundvalues = false) {
 				tempmeta.w = width;
 				tempmeta.x = mousedown.element.x + (deltaX / 2);
 			}
+
 			if (height >= minimum_size) {
 				tempmeta.h = height;
 				tempmeta.y = mousedown.element.y + (deltaY / 2);
@@ -842,53 +781,18 @@ function getresizedelement(element, mouseX, mouseY, roundvalues = false) {
 
 	else {//top-left
 			dx = -1;
-		dy = -1;
+			dy = -1;
 
-		if (usegrid) {
+			if (usegrid) {
 
-			// calc new leading edge positions 
-			var lex = (mousedown.element.x + (mousedown.element.w / 2) * dx) + (deltaX * dx);
-			var ley = (mousedown.element.y + (mousedown.element.h / 2) * dy) + (deltaY * dy);
-
-			if ((dxt == -1 && lex > Math.round(lex / grid) * grid) || (dxt == 1 && lex < Math.round(lex / grid) * grid)) {
-				console.log("M", dx, dy, dxt, dyt, lex, ley, deltaX, deltaY, mouseX, mousedown.mousemoved.x);
-				deltaX = deltaX + (((Math.round(lex / grid) * grid) - lex) * dxt);
-			}
-			else { //leave the edge where it is - no movement
-
-
-				var snaptox = Math.round(lex / grid) * grid;
-
-				console.log("B", dx, dy, dxt, dyt, lex, ley, deltaX, deltaY, mouseX, mousedown.mousemoved.x, snaptox);
-
-				if (Math.abs(deltaX) < grid / 2) {
-					deltaX = 0;
-				}
-				else {
-					deltaX = deltaX - ((lex - snaptox) * dxt);
-				}
+				var deltas = getgriddelta(dx, dy, dxt, dyt, deltaX, deltaY);
+				deltaX = deltas.deltaX;
+				deltaY = deltas.deltaY;
 
 			}
 
-			if ((dyt == -1 && ley > Math.round(ley / grid) * grid) || (dyt == 1 && ley < Math.round(ley / grid) * grid)) {
-				deltaY = deltaY + (((Math.round(ley / grid) * grid) - ley) * dyt);
-			}
-			else {
-				var snaptoy = Math.round(ley / grid) * grid;
-
-				if (Math.abs(deltaY) < grid / 2) {
-					deltaY = 0;
-				}
-				else {
-					deltaY = deltaY - ((ley - snaptoy) * dyt);
-				}
-			}
-
-			console.log("A", deltaX, deltaY);
-
-		}
-
-		width = mousedown.element.w - deltaX; height = mousedown.element.h - deltaY;
+			width = mousedown.element.w - deltaX;
+			height = mousedown.element.h - deltaY;
 
 			if (width >= minimum_size) {
 				tempmeta.w = width;
@@ -924,8 +828,6 @@ function onTimerTick() {
 	var actionelement = (resizing) ? currentelement.parentElement : currentelement;
 
 	var currentmeta = getmeta(actionelement);
-
-	//console.log("tick", currentmeta.target.x, currentmeta.target.y);
 
 	//calculate the step
 	currentmeta.step.x = easeAmount * (currentmeta.target.x - currentmeta.current.x);
@@ -964,8 +866,6 @@ function onTimerTick() {
 	//save the new location
 	setmeta(actionelement, getmeta(actionelement).original, currentmeta.current, currentmeta.target, currentmeta.step)
 
-	//console.log("tock", currentmeta.target.x, currentmeta.target.y);
-
 	//move the element
 	actionelement.style.top = (currentmeta.current.y - (currentmeta.current.h / 2)).toString() + 'px';
 	actionelement.style.left = (currentmeta.current.x - (currentmeta.current.w / 2)).toString() + 'px';
@@ -992,6 +892,7 @@ function mouseUpListener(event) {
 		document.body.style.cursor = "auto"
 		window.removeEventListener("mousemove", mouseMoveListener, false);
 	}
+
+	mousedown.snappedx = false;
+	mousedown.snappedy = false;
 }
-
-
