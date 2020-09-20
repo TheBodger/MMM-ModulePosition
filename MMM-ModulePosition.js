@@ -15,8 +15,6 @@ var currentelement;
 Module.register("MMM-ModulePosition", {
 
 	// Default module config.
-	// WARNING - added 2 layers of config, so make sure you have a display and an article section as parents to the settings
-	//in config.js
 
 	defaults: {
 		text: "... loading",
