@@ -35,7 +35,7 @@ To use this module, add the following minimum configuration block to the END of 
 
 This module uses the names allocated by the MM process, which will change depending on their absolute order within the config files. Make sure that this module is the last in the configuration file to ensure all modules have the correct name when the new layout is saved.
 
-Drag and /or resize the moduiles displayed on the MM display. Some module contents will resize to fit the new module size, others will ignore the size set due to how the module is coded.
+Drag and /or resize the modules displayed on the MM display. Some module contents will resize to fit the new module size, others will ignore the size set due to how the module is coded.
 
 Once the layout is saved, using the SAVE button, it can be found in the css sub folder of the MMM-ModulePosition folder (it should be here: modules/MMM-ModulePosition/css/)
 
