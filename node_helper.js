@@ -137,7 +137,7 @@ module.exports = NodeHelper.create({
 
 		//alert("BANG");
 
-		var cssfilename = 'custom.css.' + new Date().getTime(); //simplest format though smelly
+		var cssfilename = 'modules/MMM-ModulePosition/css/custom.css.' + new Date().getTime(); //simplest format though smelly
 
 		fs.writeFile(cssfilename, css, 'utf8', (err) => {
 			if(err) console.error(err);

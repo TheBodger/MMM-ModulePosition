@@ -1,0 +1,7 @@
+.weather#module_1_weather {
+	left:-846.96875px;
+	top:-448px;
+	width:430.0625px;
+	height:177px;
+	position:absolute !important; /*included to overide the transition static positioning that is added inline */
+}
