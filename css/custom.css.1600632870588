@@ -1,0 +1,14 @@
+.weather#module_1_weather {
+	left:-621.09375px;
+	top:-471px;
+	width:260px;
+	height:200px;
+	position:absolute !important; /*included to overide the transition static positioning that is added inline */
+}
+.clock {
+	left:-620.75px;
+	top:-221px;
+	width:250px;
+	height:200px;
+	position:absolute !important; /*included to overide the transition static positioning that is added inline */
+}

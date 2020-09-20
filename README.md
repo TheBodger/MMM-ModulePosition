@@ -3,9 +3,12 @@
 
 This magic mirror module will enable the user to dynamically select, drag and resize any module defined in their magic mirror configuration. When the desired layout is reached, the settings can be saved. These are saved as a custom CSS.
 
-### Examples showing before and after changing the layout, with text honouring the new size and the grid turned on
+### Examples:
+
+####showing before and after changing the layout, with text honouring the new size and the grid turned on, and the final layout with the module removed from the config file
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit.png?raw=true "Example screenshot")
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit2.png?raw=true "Example screenshot")
+![Example of MMM-ModulePosition resizing modules](images/screenshot_edit3.png?raw=true "Example screenshot")
 
 ### Dependencies
 
