@@ -5,7 +5,7 @@ This magic mirror module will enable the user to dynamically select, drag and re
 
 ### Examples:
 
-####showing before and after changing the layout, with text honouring the new size and the grid turned on, and the final layout with the module removed from the config file
+Showing before and after changing the layout, with text honoring the new size and the grid turned on to enable snapping, and the final layout with the module removed from the config file
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit.png?raw=true "Example screenshot")
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit2.png?raw=true "Example screenshot")
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit3.png?raw=true "Example screenshot")
@@ -20,7 +20,7 @@ Before installing this module;
 ## Installation
 To install the module, use your terminal to:
 1. Navigate to your MagicMirror's modules folder. If you are using the default installation directory, use the command:<br />`cd ~/MagicMirror/modules`
-2. Clone the module:<br />`git clone https://github.com/TheBodger/MMM-ModulePosition`
+2. Clone the module:<br />`git clone https://github.com/TheBodger/MMM-ModulePosition `
 
 ## Using the module
 
