@@ -24,7 +24,7 @@ To install the module, use your terminal to:
 
 ## Using the module
 
-### MagicMirror² Configuration
+### MagicMirrorÂ² Configuration
 
 To use this module, add the following minimum configuration block to the END of the modules array in the `config/config.js` file:
 ```js
@@ -38,7 +38,7 @@ To use this module, add the following minimum configuration block to the END of 
 
 if using MMM-carousel, add/update the ignoreModules line to include module position otherwise the module wont operate correctly
 ```js
-		
+		{
 			module: 'MMM-Carousel',
 			config: {
 				ignoreModules:['MMM-ModulePosition'],
