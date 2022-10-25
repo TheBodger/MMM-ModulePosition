@@ -51,13 +51,13 @@ if using MMM-carousel, add/update the ignoreModules line to include module posit
 
 This module uses the names allocated by the MM process, which will change depending on their absolute order within the config files. Make sure that this module is the last in the configuration file to ensure all modules have the correct name when the new layout is saved.
 
-Drag and /or resize the modules displayed on the MM display. Some module contents will resize to fit the new module size, others will ignore the size set due to how the module is coded.
+Drag and /or resize the modules displayed on the MM display. Some module contents will resize to fit the new module size, others will ignore the size set due to how that particular module is coded.
 
 Once the layout is saved, using the SAVE button, it can be found in the css sub folder of the MMM-ModulePosition folder (it should be here: modules/MMM-ModulePosition/css/)
 
-EAch save is given the name of custom.css.timestamp, where timestamp is a numeric representation of the time when the file is saved and will always be unique.
+Each save is given the name of custom.css.timestamp, where timestamp is a numeric representation of the time when the file is saved and will always be unique. This is to allow multiple saves within one positioning session without overwriting each save.
 
-To use the saved custom css file, simply copy all the contents and paste into the bottom of the custom.css file found in the css folder, normally found as a sub folder to the MagicMirror folder. Remove this module from the config file and restart MM2.
+To use the saved custom css file, simply copy all the contents and paste into the bottom of the custom.css file found in the magic mirror css folder, normally found as a sub folder to the MagicMirror folder. Remove this module from the config file and restart MM2.
 
 If any new modules are added to the MM config, to maintain the validity of the new custom CSS, ensure they are added at the end of the modules list. If a module is removed, then the custom CSS may not behave as expected and a new custom CSS will need to be created.
 
@@ -79,4 +79,4 @@ This is a WIP; changes are being made all the time to improve the compatibility 
 
 Leave settings as the default for best results, minimum size is probably the only setting that may need amending depending on the size of the MM2 display
 
-This has been tested with a number of different MM layout and layout options. It may however not cater for all combinations and may have problems with modules that adjust the modules displayed in the MM display. Try it out to see if it works ok with your favorite layout.
+This has been tested with a number of different MM layouts and layout options. It may however not cater for all combinations and may have problems with modules that adjust the modules displayed in the MM display or that to swap between sets of visible modules. Try it out to see if it works ok with your favorite layout. Raise an issue in Github if it doesnt work as expected.
