@@ -38,6 +38,14 @@ var config = {
 	//fullscreen_above, and fullscreen_below
 
 	modules: [
+		//if using MMM-carousel, add/update the ignoreModules line to include module position
+		//{
+		//	module: 'MMM-Carousel',
+		//	config: {
+		//		ignoreModules:['MMM-ModulePosition'],
+		//      }
+		//},
+
 		{
 			module: "alert",
 		},

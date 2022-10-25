@@ -34,6 +34,19 @@ To use this module, add the following minimum configuration block to the END of 
 		},
 ```
 
+### MMM-Carousel compatability
+
+if using MMM-carousel, add/update the ignoreModules line to include module position otherwise the module wont operate correctly
+```js
+		
+			module: 'MMM-Carousel',
+			config: {
+				ignoreModules:['MMM-ModulePosition'],
+				//reset of config
+		      }
+		},
+```
+
 ### Saving and using custom.css
 
 This module uses the names allocated by the MM process, which will change depending on their absolute order within the config files. Make sure that this module is the last in the configuration file to ensure all modules have the correct name when the new layout is saved.
