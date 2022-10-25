@@ -42,7 +42,7 @@ if using MMM-carousel, add/update the ignoreModules line to include module posit
 			module: 'MMM-Carousel',
 			config: {
 				ignoreModules:['MMM-ModulePosition'],
-				//reset of config
+				//rest of config
 		      }
 		},
 ```
