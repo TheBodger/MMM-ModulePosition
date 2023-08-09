@@ -35,7 +35,7 @@ To use this module, add the following minimum configuration block to the END of 
 ```
 ### Not quite WYSIWYG
 
-When repositioning modules, their contents may left justify. This is only in the positioner and when the custom.css is applied and the postioning module removed from the config, the correct justifcation will be shown on you magic mirror.
+When repositioning modules, their contents may left justify. This is only in the positioner and when the custom.css is applied and the postioning module removed from the config, the correct justification will be shown on you magic mirror.
 ### MMM-Carousel compatability
 
 if using MMM-carousel, add/update the ignoreModules line to include module position otherwise the module wont operate correctly
