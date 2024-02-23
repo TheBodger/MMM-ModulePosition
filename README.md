@@ -48,6 +48,11 @@ if using MMM-carousel, add/update the ignoreModules line to include module posit
 		      }
 		},
 ```
+If you are using the carousel arrow keys that appear on the screen, these wil be disabled when running this module. there is a simple workaround.
+
+If the carousel transitioninterval is set to 0, temporarily change it to 10000 ~(10 seconds) which will ensure each slide is shown whilst this module is running. Any changes made on any of the slides during an edit session will be captured in the save file and can be used in custom.css as described below.
+
+This also works if you already have the slides changing automatically.
 
 ### Saving and using custom.css
 
