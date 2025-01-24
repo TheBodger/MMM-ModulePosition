@@ -80,7 +80,7 @@ var config = {
 				weatherProvider: "ukmetoffice",
 				apiBase: "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/",
 				locationID: 350153, //Ascot http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/sitelist?key=2acecf0e-fb12-4870-b1e0-975b728172f7
-				apiKey: "2acecf0e-fb12-4870-b1e0-975b728172f7", // met office datapoints, neilstjscott account
+				apiKey: "ADD YOUR API KEY HERE", // met office datapoints
 			}
 		},
 
@@ -92,7 +92,7 @@ var config = {
 				weatherProvider: "ukmetoffice",
 				apiBase: "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/",
 				locationID: 350153, //Ascot http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/sitelist?key=2acecf0e-fb12-4870-b1e0-975b728172f7
-				apiKey: "2acecf0e-fb12-4870-b1e0-975b728172f7", // met office datapoints, neilstjscott account
+				apiKey: "ADD YOUR API KEY HERE", // met office datapoints
 			}
 		},
 		{
@@ -116,6 +116,10 @@ var config = {
 				broadcastNewsFeeds: false,
 				broadcastNewsUpdates: false
 			}
+		},
+		{
+			module: "MMM-ModulePosition",
+			position: "fullscreen_below",
 		},
 	]
 
