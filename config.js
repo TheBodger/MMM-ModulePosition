@@ -74,25 +74,23 @@ var config = {
 		},
 		{
 			module: "weather",
-			position: "top_center",
+			position: "top_right",
 			config: {
+				weatherProvider: "openmeteo",
 				type: "current",
-				weatherProvider: "ukmetoffice",
-				apiBase: "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/",
-				locationID: 350153, //Ascot http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/sitelist?key=2acecf0e-fb12-4870-b1e0-975b728172f7
-				apiKey: "ADD YOUR API KEY HERE", // met office datapoints
+				lat: 40.776676,
+				lon: -73.971321
 			}
 		},
-
 		{
 			module: "weather",
-			position: "bottom_center",
+			position: "top_right",
+			header: "Weather Forecast",
 			config: {
+				weatherProvider: "openmeteo",
 				type: "forecast",
-				weatherProvider: "ukmetoffice",
-				apiBase: "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/",
-				locationID: 350153, //Ascot http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/sitelist?key=2acecf0e-fb12-4870-b1e0-975b728172f7
-				apiKey: "ADD YOUR API KEY HERE", // met office datapoints
+				lat: 40.776676,
+				lon: -73.971321
 			}
 		},
 		{
