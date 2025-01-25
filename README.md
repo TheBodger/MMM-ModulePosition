@@ -74,11 +74,12 @@ If any new modules are added to the MM config, to maintain the validity of the n
 | Option                  | Details
 |------------------------ |--------------
 | `text`                | *Optional* - <br><br> **Possible values:** Any string.<br> **Default value:** "... loading"
-| `easeAmount`            | *Required* - the percentage of the total delta to move an object during each frame<br><br> **Possible values:** a numeric value where 1 = 100%<br> **Default value:** 0.3
-| `FPS`         | *Required* - frames per second of the animation of objects during resizing and dragging<br><br> **Possible values:** a whole numeric value between 5 and 60 <br> **Default value:** 15
-| `minimum_size`            | *Required* - minimum size in pixels that the resizer will allow an objects width and height to be.<br><br> **Possible values:** a whole number of pixels <br> **Default value:** 50 
-| `canvasid`        | *Required* - the name of the dom element within the MM display to use as a relative container for any movements. If not set then the window is used.<br><br> **Possible values:** any dom element defined within the current MM display <br> **Default value:** `"body"`
-| `grid`            |*Required* -  the size of a grid in pixels to snap modules to when dragging and resizing<br><br> **Possible values:** a whole number of pixels. <br> **Default value:** 10
+| `easeAmount`            | *Optional* - the percentage of the total delta to move an object during each frame<br><br> **Possible values:** a numeric value where 1 = 100%<br> **Default value:** 0.3
+| `FPS`         | *Optional* - frames per second of the animation of objects during resizing and dragging<br><br> **Possible values:** a whole numeric value between 5 and 60 <br> **Default value:** 15
+| `minimum_size`            | *Optional* - minimum size in pixels that the resizer will allow an objects width and height to be.<br><br> **Possible values:** a whole number of pixels <br> **Default value:** 50 
+| `canvasid`        | *Optional* - the name of the dom element within the MM display to use as a relative container for any movements. If not set then the window is used.<br><br> **Possible values:** any dom element defined within the current MM display <br> **Default value:** `"body"`
+| `grid`            |*Optional* -  the size of a grid in pixels to snap modules to when dragging and resizing<br><br> **Possible values:** a whole number of pixels. <br> **Default value:** 10
+| `showAlerts`            |*Optional* -  display javscript alerts on the screen that are created for events such as custom css file save<br><br> **Possible values:** true,false <br> **Default value:** true
 
 ### Additional Notes
 

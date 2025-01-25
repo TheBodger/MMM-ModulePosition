@@ -23,6 +23,7 @@ Module.register("MMM-ModulePosition", {
 		minimum_size: 50, //minimum size in px that the resizer will  go down to
 		canvasid: "body", //the overall parent for all movement constraints, any named DOM element, or if null a canvas is created from the visible window
 		grid: 10, //the size of a grid to snap modules to when dragging and resizing which is enabled within the running MM2
+		showAlerts: true, //show alerts on screen (File save, number of modules repositioned etc)
 	},
 
 	start: function () {
@@ -87,6 +88,15 @@ Module.register("MMM-ModulePosition", {
 		var self = this;
 		Log.log(self.identifier + " " + this.identifier + "hello, received a socket notification @ " + this.showElapsed() + " " + notification + " - Payload: " + payload);
 
+		if (notification == 'ALERT') {
+			self.showNotification(notification,payload);
+		}
+
+	},
+
+	showNotification: function (msg, content)
+	{
+		alert(msg + ":" + content);
 	},
 
 	setupconfig: function () {

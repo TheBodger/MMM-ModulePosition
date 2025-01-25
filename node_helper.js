@@ -109,6 +109,7 @@ module.exports = NodeHelper.create({
 
 		var modules = payload.payload;
 		var css = '';
+		var modCount = 0;
 
 		for (var module in modules) {
 
@@ -127,6 +128,7 @@ module.exports = NodeHelper.create({
 					'\n\theight:' + thismod.modpos.h + "px;" +
 					'\n\tposition:' + 'absolute' + " !important; /*included to overide the transition static positioning that is added inline */" +
 					'\n}' + "\r\n"
+				modCount = modCount + 1;
 				
             }
         }
@@ -142,6 +144,7 @@ module.exports = NodeHelper.create({
 		fs.writeFile(cssfilename, css, 'utf8', (err) => {
 			if(err) console.error(err);
 			console.log('The file has been saved!');
+			if (this.consumerstorage[this.currentmoduleinstance].config.showAlerts) this.sendNotificationToMasterModule("ALERT", " FILE:" + cssfilename + " saved with " + modCount + " module" + ((modCount>1) ? 's' : '') +" positioned.");
 		});
 
 	},
