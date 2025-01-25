@@ -5,7 +5,7 @@ This magic mirror module will enable the user to dynamically select, drag and re
 
 ### Examples:
 
-Showing before and after changing the layout, with text honoring the new size and the grid turned on to enable snapping, and the final layout with the module removed from the config file
+Showing before and after changing the layout, with text honoring the new size and the grid turned on to enable snapping, and the final layout with the module removed from the config file. Final Screenshot shows an alert when the custom css is saved and the number of repositioned /resized modules included
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit.png?raw=true "Example screenshot")
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit2.png?raw=true "Example screenshot")
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit3.png?raw=true "Example screenshot")
