@@ -9,6 +9,7 @@ Showing before and after changing the layout, with text honoring the new size an
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit.png?raw=true "Example screenshot")
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit2.png?raw=true "Example screenshot")
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit3.png?raw=true "Example screenshot")
+![Example of MMM-ModulePosition resizing modules](images/screenshot_save.png?raw=true "Alert message on Save")
 
 ### Dependencies
 
