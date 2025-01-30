@@ -23,6 +23,11 @@ To install the module, use your terminal to:
 1. Navigate to your MagicMirror's modules folder. If you are using the default installation directory, use the command:<br />`cd ~/MagicMirror/modules`
 2. Clone the module:<br />`git clone https://github.com/TheBodger/MMM-ModulePosition `
 
+## Update
+to update this module, use your terminal to:
+1. `cd ~/MagicMirror/modules/MMM-ModulePosition`
+2. `git pull`
+
 ## Using the module
 
 ### MagicMirror² Configuration
