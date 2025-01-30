@@ -42,6 +42,11 @@ To use this module, add the following minimum configuration block to the END of 
 ### Not quite WYSIWYG
 
 When repositioning modules, their contents may left justify. This is only in the positioner and when the custom.css is applied and the postioning module removed from the config, the correct justification will be shown on you magic mirror.
+
+### Known "Features"
+
+The MMM-WallPaper module (https://github.com/kolbyjack/MMM-Wallpaper) - awesome module! covers the grid. Grid snapping will still work but the grid will not be visible. The grid will be visible when the MMM-WallPaper module is removed from the config file.
+
 ### MMM-Carousel compatability
 
 if using MMM-carousel, add/update the ignoreModules line to include module position otherwise the module wont operate correctly
