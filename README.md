@@ -43,7 +43,9 @@ To use this module, add the following minimum configuration block to the END of 
 
 When repositioning modules, their contents may left justify. This is only in the positioner and when the custom.css is applied and the postioning module removed from the config, the correct justification will be shown on you magic mirror.
 
-### Known "Features"
+### Known "Features" and Docker watch outs
+
+Docker implementations may not provide all the permissions required to write the custom CSS to the css folder. If the file isnt being written or is empty, check that the css folder in the MMM-ModulePosition folder has write permissions for the Docker instance. i.e. Synology NAS requires that the folder has read/write access applied for Everyone
 
 The MMM-WallPaper module (https://github.com/kolbyjack/MMM-Wallpaper) - awesome module! covers the grid. Grid snapping will still work but the grid will not be visible. The grid will be visible when the MMM-WallPaper module is removed from the config file.
 
