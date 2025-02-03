@@ -292,7 +292,9 @@ Module.register("MMM-ModulePosition", {
 			};
 		}
 
-		//send them to the nodehelper to write out 
+		//send them to the nodehelper to write out
+
+		Log.log(self.identifier + " " + "SENDING WRITE_THIS TO NODEHELPER");
 
 		this.sendNotificationToNodeHelper("WRITE_THIS", { moduleinstance: this.identifier, payload: this.moduletracking });
 

@@ -10,7 +10,10 @@
 var NodeHelper = require("node_helper");
 
 var moment = require("moment");
-fs = require('fs');
+//fs = require('fs');
+const fs = require('node:fs/promises');
+
+const Log = require("logger");
 
 //pseudo structures for commonality across all modules
 //obtained from a helper file of modules
@@ -33,6 +36,8 @@ module.exports = NodeHelper.create({
 		this.debug = true;
 
 		console.log(this.name + ' is started!');
+		Log.info(`MMM-ModulePosition node_helper.js started`);
+		LOG.info(`MMM-ModulePosition node_helper.js started`);
 		this.consumerstorage = {}; // contains the config and feedstorage
 
 		this.currentmoduleinstance = '';
@@ -96,7 +101,7 @@ module.exports = NodeHelper.create({
 		switch (notification) {
 			case "CONFIG": this.setconfig(payload); break;
 			case "RESET": this.reset(payload); break;
-			case "WRITE_THIS":this.writethis(payload); break;
+			case "WRITE_THIS": this.writethis(payload); break;
 			case "STATUS": this.showstatus(payload); break;
 		}
 	},
@@ -120,7 +125,7 @@ module.exports = NodeHelper.create({
 			if (!thismod.ignore && thismod.state.active && thismod.state.amended) {
 
 				css = css + '.' + thismod.name +
-					((thismod.duplicate) ? '#' + module : '') + 
+					((thismod.duplicate) ? '#' + module : '') +
 					' {' +
 					'\n\tleft:' + thismod.modpos.x + "px;" +
 					'\n\ttop:' + thismod.modpos.y + "px;" +
@@ -129,9 +134,9 @@ module.exports = NodeHelper.create({
 					'\n\tposition:' + 'absolute' + " !important; /*included to overide the transition static positioning that is added inline */" +
 					'\n}' + "\r\n"
 				modCount = modCount + 1;
-				
-            }
-        }
+
+			}
+		}
 
 		// dont check if there are no modpos ! just write it
 
@@ -140,17 +145,32 @@ module.exports = NodeHelper.create({
 		//alert("BANG");
 
 		var cssfilename = 'modules/MMM-ModulePosition/css/custom.css.' + new Date().getTime(); //simplest format though smelly
+		//Log.info(`about to call module writeCSSfile`);
 
-		fs.writeFile(cssfilename, css, 'utf8', (err) => {
-			if(err) console.error(err);
-			console.log('The file has been saved!');
-			if (this.consumerstorage[this.currentmoduleinstance].config.showAlerts) this.sendNotificationToMasterModule("ALERT", " FILE:" + cssfilename + " saved with " + modCount + " module" + ((modCount>1) ? 's' : '') +" positioned.");
-		});
+		this.writeCSSfile(cssfilename, css, modCount)
+
+		//fs.writeFile(cssfilename, css, 'utf8', (err) => {
+		//	if(err) console.error(err);
+		//	console.log('The file has been saved!');
+		//	if (this.consumerstorage[this.currentmoduleinstance].config.showAlerts) this.sendNotificationToMasterModule("ALERT", " FILE:" + cssfilename + " saved with " + modCount + " module" + ((modCount>1) ? 's' : '') +" positioned.");
+		//});
 
 	},
 
-	sendNotificationToMasterModule: function(stuff, stuff2){
+	sendNotificationToMasterModule: function (stuff, stuff2) {
 		this.sendSocketNotification(stuff, stuff2);
-	}
+	},
+
+	writeCSSfile: function (filename, filecontent, modcount) {
+		//Log.info(`In module writeCSSfile`);
+		try {
+			fs.writeFile(filename, filecontent);
+			setTimeout(() => {}, 1000);
+			Log.info(`The file has been saved: ${filename}`);
+			if (this.consumerstorage[this.currentmoduleinstance].config.showAlerts) this.sendNotificationToMasterModule("ALERT", " NEW CSS FILE:" + filename + " saved with " + modcount + " module" + ((modcount > 1) ? 's' : '') + " positioned.");
+		} catch (err) {
+			Log.error(err);
+		}
+	},
 
 });
