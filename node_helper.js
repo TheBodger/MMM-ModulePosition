@@ -37,7 +37,7 @@ module.exports = NodeHelper.create({
 
 		console.log(this.name + ' is started!');
 		Log.info(`MMM-ModulePosition node_helper.js started`);
-		LOG.info(`MMM-ModulePosition node_helper.js started`);
+
 		this.consumerstorage = {}; // contains the config and feedstorage
 
 		this.currentmoduleinstance = '';
