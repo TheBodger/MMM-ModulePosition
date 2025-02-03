@@ -1,0 +1,14 @@
+.MMM-FlipClock {
+	left:0px;
+	top:443px;
+	width:2432px;
+	height:182px;
+	position:absolute !important; /*included to overide the transition static positioning that is added inline */
+}
+.calendar {
+	left:742px;
+	top:-166px;
+	width:347.90625px;
+	height:343px;
+	position:absolute !important; /*included to overide the transition static positioning that is added inline */
+}
