@@ -10,8 +10,9 @@ Showing before and after changing the layout, with text honoring the new size an
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit2.png?raw=true "Example screenshot")
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit3.png?raw=true "Example screenshot")
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_save.png?raw=true "Alert message on Save")
-
+The Video below was speeded up 5 times. To ensure the best results, all the modules where given the position of top_bar.
 ![Video of MMM-ModulePosition resizing modules](images/before.gif)
+This shows the result after the custom.css was applied and moduleposition removed.
 ![Example of MMM-ModulePosition resizing modules](images/after.png?raw=true "Modules repositioned")
 
 ### Dependencies
