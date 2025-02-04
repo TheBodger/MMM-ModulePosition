@@ -45,7 +45,7 @@ To use this module, add the following minimum configuration block to the END of 
 ```
 ### Not quite WYSIWYG
 
-If planning to reposition and / or resize most or all of the modules, moving them across the screen far from their original positions, the best way of ensuring the best results is to give them the same initial module position in the config.js. top_bar or top_right works best. 
+If planning to reposition and / or resize most or all of the modules, moving them across the screen far from their original positions, the best way of ensuring the best results is to give them the same initial module position in the config.js. top_bar works best. 
 
 When repositioning modules, their contents may left justify. This is only in the positioner and when the custom.css is applied and the postioning module removed from the config, the correct justification will be shown on you magic mirror.
 
