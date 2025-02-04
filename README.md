@@ -11,7 +11,9 @@ Showing before and after changing the layout, with text honoring the new size an
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_edit3.png?raw=true "Example screenshot")
 ![Example of MMM-ModulePosition resizing modules](images/screenshot_save.png?raw=true "Alert message on Save")
 
-![Video of MMM-ModulePosition resizing modules]("images/Untitled video - Made with Clipchamp.gif"?raw=true "Positioning Modules")
+![Video of MMM-ModulePosition resizing modules](""?raw=true "Positioning Modules")
+
+![Video of MMM-ModulePosition resizing modules](images/Untitled video - Made with Clipchamp.gif)
 
 ### Dependencies
 
