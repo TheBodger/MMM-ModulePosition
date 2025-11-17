@@ -51,8 +51,6 @@ When repositioning modules, their contents may left justify. This is only in the
 
 ### Known "Features" and Docker watch outs
 
-The grid lines may not appear when using the native Electron browser on a pi. This is being investigated!
-
 Docker implementations may not provide all the permissions required to write the custom CSS to the css folder. If the file isnt being written or is empty, check that the css folder in the MMM-ModulePosition folder has write permissions for the Docker instance. i.e. Synology NAS requires that the folder has read/write access applied for Everyone
 
 The MMM-WallPaper module (https://github.com/kolbyjack/MMM-Wallpaper) - awesome module! covers the grid. Grid snapping will still work but the grid will not be visible. The grid will be visible when the MMM-WallPaper module is removed from the config file.
@@ -109,4 +107,5 @@ This is a WIP; changes are being made all the time to improve the compatibility 
 Leave settings as the default for best results, minimum size is probably the only setting that may need amending depending on the size of the MM2 display
 
 This has been tested with a number of different MM layouts and layout options. It may however not cater for all combinations and may have problems with modules that adjust the modules displayed in the MM display or that swap between sets of visible modules. Try it out to see if it works ok with your favorite layout. Raise an issue in Github if it doesnt work as expected.
+
 
