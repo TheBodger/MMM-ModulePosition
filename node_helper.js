@@ -18,8 +18,8 @@ const Log = require("logger");
 //pseudo structures for commonality across all modules
 //obtained from a helper file of modules
 
-var LOG = require('../MMM-FeedUtilities/LOG');
-var RSS = require('../MMM-FeedUtilities/RSS');
+//var LOG = require('../MMM-FeedUtilities/LOG');
+//var RSS = require('../MMM-FeedUtilities/RSS');
 
 //// get required structures and utilities
 
@@ -90,11 +90,11 @@ module.exports = NodeHelper.create({
 		//we will receive a payload with the moduleinstance of the consumerid in it so we can store data and respond to the correct instance of
 		//the caller - i think that this may be possible!!
 
-		if (this.logger[payload.moduleinstance] == null) {
+		//if (this.logger[payload.moduleinstance] == null) {
 
-			this.logger[payload.moduleinstance] = LOG.createLogger("logfile_" + payload.moduleinstance + ".log", payload.moduleinstance);
+		//	this.logger[payload.moduleinstance] = LOG.createLogger("logfile_" + payload.moduleinstance + ".log", payload.moduleinstance);
 
-		};
+		//};
 
 		this.currentmoduleinstance = payload.moduleinstance;
 

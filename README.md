@@ -17,10 +17,6 @@ This shows the result after the custom.css was applied and moduleposition remove
 
 ### Dependencies
 
-This module requires MMM-FeedUtilities to be installed.
-
-Before installing this module;
-		use https://github.com/TheBodger/MMM-FeedUtilities to setup the MMM-Feed... dependencies and  install all modules.
 
 ## Installation
 To install the module, use your terminal to:
