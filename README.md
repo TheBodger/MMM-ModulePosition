@@ -102,7 +102,7 @@ Leave settings as the default for best results, minimum size is probably the onl
 
 This has been tested with a number of different MM layouts and layout options. It may however not cater for all combinations and may have problems with modules that adjust the modules displayed in the MM display or that swap between sets of visible modules. Try it out to see if it works ok with your favorite layout. Raise an issue in Github if it doesnt work as expected.
 
-Magic Mirror by default leaves a gap (or margin) around the display arrea of 60 pixels. If you want to use the full screen area of the modules to display in, add the following to the top of the custom.css in the css folder
+Magic Mirror by default leaves a gap (or margin) around the display area of 60 pixels which you can see when the grid is displayed. If you want to use the full screen area of the modules to display in, add the following to the top of the custom.css in the css folder
 ```css
 :root {
   --gap-body-top: 0px;
@@ -111,5 +111,6 @@ Magic Mirror by default leaves a gap (or margin) around the display arrea of 60 
   --gap-body-left: 0px;
   }
 ```
+
 
 
