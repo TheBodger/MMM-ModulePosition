@@ -94,7 +94,7 @@ If any new modules are added to the MM config, to maintain the validity of the n
 | `minimum_size`            | *Optional* - minimum size in pixels that the resizer will allow an objects width and height to be.<br><br> **Possible values:** a whole number of pixels <br> **Default value:** 50 
 | `canvasid`        | *Optional* - the name of the dom element within the MM display to use as a relative container for any movements. If not set then the window is used.<br><br> **Possible values:** any dom element defined within the current MM display <br> **Default value:** `"body"`
 | `grid`            |*Optional* -  the size of a grid in pixels to snap modules to when dragging and resizing<br><br> **Possible values:** a whole number of pixels. <br> **Default value:** 10
-| `showAlerts`            |*Optional* -  display javscript alerts on the screen that are created for events such as custom css file save<br><br> **Possible values:** true,false <br> **Default value:** true
+| `showAlerts`            |*Optional* -  display javascript alerts on the screen that are created for events such as custom css file save<br><br> **Possible values:** true,false <br> **Default value:** true
 
 ### Additional Notes
 
@@ -111,6 +111,7 @@ Magic Mirror by default leaves a gap (or margin) around the display area of 60 p
   --gap-body-left: 0px;
   }
 ```
+
 
 
 
