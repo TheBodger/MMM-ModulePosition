@@ -41,7 +41,7 @@ To use this module, add the following minimum configuration block to the END of 
 ```
 ### Not quite WYSIWYG
 
-If planning to reposition and / or resize most or all of the modules, moving them across the screen far from their original positions, the best way of ensuring the best results is to give them the same initial module position in the config.js. top_bar works best. 
+If planning to reposition and / or resize most or all of the modules, moving them across the screen far from their original positions, the nice trick of ensuring the best results is to give them the same initial module position in the config.js of top_bar. It seems to works best. 
 
 When repositioning modules, their contents may left justify. This is only in the positioner and when the custom.css is applied and the postioning module removed from the config, the correct justification will be shown on you magic mirror.
 
@@ -75,7 +75,7 @@ This module uses the names allocated by the MM process, which will change depend
 
 Drag and /or resize the modules displayed on the MM display. Some module contents will resize to fit the new module size, others will ignore the size set due to how that particular module is coded.
 
-Once the layout is saved, using the SAVE button, it can be found in the css sub folder of the MMM-ModulePosition folder (it should be here: modules/MMM-ModulePosition/css/)
+Once the layout is saved, using the SAVE button, the custom.css file can be found in the css sub folder of the MMM-ModulePosition folder (it should be here: modules/MMM-ModulePosition/css/)
 
 Each save is given the name of custom.css.timestamp, where timestamp is a numeric representation of the time when the file is saved and will always be unique. This is to allow multiple saves within one positioning session without overwriting each save.
 
@@ -111,6 +111,7 @@ Magic Mirror by default leaves a gap (or margin) around the display area of 60 p
   --gap-body-left: 0px;
   }
 ```
+
 
 
 
